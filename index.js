@@ -1,4 +1,5 @@
-const http = require("http");
+const express = require("express");
+const app = express();
 const port = 3000;
 
 const data = [
@@ -16,34 +17,10 @@ const data = [
 	},
 ];
 
-const requestHandler = (request, response) => {
-	console.log(request.method);
-	response.writeHead(200, {
-		"Content-type": "application/json",
-	});
+app.get("/products", (req, res) => {
+	res.send(data);
+});
 
-	if (request.url === "/products") {
-		if (request.method === "GET") {
-			response.end(JSON.stringify(data));
-		}
-		if (request.method === "POST") {
-			let body = "";
-			request.on("data", (chunk) => {
-				body += chunk.toString();
-			});
-			request.on("end", () => {
-				data.push(JSON.parse(body))
-				response.end();
-			});
-		}
-	} else {
-		response.end();
-	}
-};
-const server = http.createServer(requestHandler);
-server.listen(port, (err) => {
-	if (err) {
-		return console.log("something bad happened", err);
-	}
-	console.log(`server is listening on ${port}`);
+app.listen(port, () => {
+	console.log(`Example app listening on port ${port}`);
 });
