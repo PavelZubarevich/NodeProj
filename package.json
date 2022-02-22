@@ -18,7 +18,8 @@
   },
   "homepage": "https://github.com/PavelZubarevich/Node-Lab#readme",
   "dependencies": {
-    "express": "^4.17.3"
+    "express": "^4.17.3",
+    "mongodb": "^4.4.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
