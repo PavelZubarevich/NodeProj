@@ -1,3 +1,3 @@
-import productRouter from "./product";
+import productRouter from './product';
 
 export { productRouter };
