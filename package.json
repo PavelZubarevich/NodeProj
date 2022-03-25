@@ -6,7 +6,8 @@
   "scripts": {
     "start": "ts-node-dev src/index.ts",
     "build": "tsc && nodemon dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -18,11 +19,6 @@
     "url": "https://github.com/PavelZubarevich/Node-Lab/issues"
   },
   "homepage": "https://github.com/PavelZubarevich/Node-Lab#readme",
-  "husky": {
-    "hooks": {
-      "pre-commit": "echo \"[Husky] message\""
-    }
-  },
   "dependencies": {
     "@typegoose/typegoose": "^9.7.1",
     "@types/mongoose": "^5.11.97",
