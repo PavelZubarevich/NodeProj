@@ -1,7 +1,6 @@
-const mongoose = require("mongoose");
-const express = require("express");
-const Product = require("./models/produst");
-const Category = require("./models/category");
+import mongoose from "mongoose";
+import express from "express";
+import { productRouter } from "./routes";
 
 const url = "mongodb://localhost:27017/testProducts";
 const app = express();
@@ -24,9 +23,4 @@ const conectDB = async () => {
 
 conectDB();
 
-app.get("/products", (req, res) => {
-	Product.find((err, users) => {
-		err && console.log(err);
-		res.send(users);
-	});
-});
+app.use('/products', productRouter)
