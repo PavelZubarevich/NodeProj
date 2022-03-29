@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { Products } from '../entity/Products';
-import { Category } from '../entity/Category';
+import { SQLProduct, SQLCategory } from '../entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -12,7 +11,7 @@ export const AppDataSource = new DataSource({
   database: 'node_lab',
   synchronize: true,
   logging: false,
-  entities: [Products, Category],
+  entities: [SQLProduct, SQLCategory],
   migrations: [],
-  subscribers: [],
+  subscribers: []
 });
