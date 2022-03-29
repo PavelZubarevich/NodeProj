@@ -1,26 +1,26 @@
-import mongoose from 'mongoose';
 import express from 'express';
 import { productRouter } from './routes';
+import { AppDataSource } from './db/postgresql';
+import { connect } from './db/mongo';
 
-const url = 'mongodb://localhost:27017/testProducts';
 const app = express();
 const port = 3000;
+const mongo = 'mongo';
 
 const startServer = () => {
   app.listen(port, () => {
-    console.log(`App listening on port ${port}`);
+    console.log(`App listening on port ${port}, using ${process.env.DB} dataBase`);
   });
 };
 
-const conectDB = async () => {
-  try {
-    await mongoose.connect(url);
+if (process.env.DB === mongo) {
+  connect().then(() => {
     startServer();
-  } catch (e) {
-    console.log(e);
-  }
-};
-
-conectDB();
+  });
+} else {
+  AppDataSource.initialize().then(() => {
+    startServer();
+  });
+}
 
 app.use('/products', productRouter);
