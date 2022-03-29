@@ -30,7 +30,8 @@
     "mongoose": "^6.2.3",
     "pg": "^8.4.0",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "0.3.4"
+    "typeorm": "0.3.4",
+    "winston": "^3.6.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
