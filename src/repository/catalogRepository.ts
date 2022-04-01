@@ -8,7 +8,7 @@ const mongo = 'mongo';
 
 class CategoryTypegooseRepository implements IProductRepository {
   async all(req: Request, res: Response) {
-    const products = await MongoCategory.find();
+    const products = await MongoCategory.find({}, 'displayName');
 
     if (products) {
       res.send(products);

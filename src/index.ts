@@ -1,5 +1,5 @@
 import express from 'express';
-import { productRouter } from './routes';
+import { productRouter, categoryRouter } from './routes';
 import { AppDataSource } from './db/postgresql';
 import { connect } from './db/mongo';
 import { APILogger, DBsLogger } from './logger';
@@ -31,3 +31,4 @@ try {
 
 app.use(APILogger);
 app.use('/products', productRouter);
+app.use('/categories', categoryRouter);
