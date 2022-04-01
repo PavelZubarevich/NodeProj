@@ -12,6 +12,8 @@ class ProductTypegooseRepository implements IProductRepository {
     const displayNameReg: RegExp = new RegExp(`${query.displayName}`);
     const prices: Array<string> = query.price?.toString().split(':') || [];
     const findProps: IFindProps = {};
+    const skip: number = +(query.offset || 0);
+    const limit: number = +(query.limit || Infinity);
 
     query.displayName && (findProps.displayName = displayNameReg);
     query.minRating && (findProps.totalRating = { $gt: query.minRating });
@@ -30,7 +32,7 @@ class ProductTypegooseRepository implements IProductRepository {
       sortProps[sortingParams[0]] = sortingParams[1];
     }
 
-    const products = await MongoProduct.find(findProps).sort(sortProps).exec();
+    const products = await MongoProduct.find(findProps).sort(sortProps).skip(skip).limit(limit).exec();
 
     if (products) {
       res.send(products);
