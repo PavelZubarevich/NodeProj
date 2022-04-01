@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "ts-node-dev src/index.ts",
     "startSQL": "cross-env NODE_ENV=development DB=pg DB_CONN_STRING=postgres://localhost:5432/db npm start",
     "startMongo": "cross-env NODE_ENV=development DB=mongo DB_CONN_STRING=mongodb://localhost:27017/db npm start",
     "build": "tsc && nodemon dist/index.js",
