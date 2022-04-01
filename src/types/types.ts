@@ -1,7 +1,9 @@
 import { Types } from 'mongoose';
-import { prop } from '@typegoose/typegoose';
+import { prop, index } from '@typegoose/typegoose';
 import { Response, Request, NextFunction } from 'express';
 
+@index({ totalRating: 1 })
+@index({ price: 1 })
 export class ProductClass {
   @prop()
   public displayName?: string;
@@ -33,4 +35,18 @@ export interface IProductRepository {
 
 export interface ICategoryRepository {
   all(req: Request, res: Response, next: NextFunction): void;
+}
+
+export interface ITotalRatingFilter {
+  $gt?: number;
+  $lt?: number;
+}
+export interface IFindProps {
+  displayName?: RegExp;
+  totalRating?: Object;
+  price?: ITotalRatingFilter;
+}
+
+export interface ISortProps {
+  [key: string]: string;
 }
