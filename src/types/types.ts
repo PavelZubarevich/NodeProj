@@ -1,6 +1,7 @@
 // import { Types } from 'mongoose';
 import { prop, index, Ref } from '@typegoose/typegoose';
 import { Response, Request, NextFunction } from 'express';
+import { FindOptionsOrderValue } from 'typeorm';
 
 export class CategoryClass {
   @prop()
@@ -50,4 +51,8 @@ export interface IFindProps {
 
 export interface ISortProps {
   [key: string]: string;
+}
+
+export interface ISQLSortProps {
+  [key: string]: FindOptionsOrderValue;
 }
