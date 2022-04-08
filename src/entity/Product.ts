@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Index, ManyToMany, JoinTable } from 'typeorm';
 import { SQLCategory } from './Category';
 
 @Entity()
@@ -12,12 +12,15 @@ export class SQLProduct {
   @Column()
   createdAt?: Date;
 
+  @Index()
   @Column()
   totalRating?: number;
 
+  @Index()
   @Column()
   price?: number;
 
-  @ManyToOne(() => SQLCategory, (category) => category.products) // note: we will create author property in the Photo class below
-  category?: SQLCategory;
+  @ManyToMany(() => SQLCategory, (category) => category.products)
+  @JoinTable()
+  categoryId?: SQLCategory[];
 }
