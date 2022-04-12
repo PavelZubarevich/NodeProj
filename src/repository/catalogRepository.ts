@@ -72,7 +72,6 @@ class CategoryTypeOrmRepository implements ICategoryRepository {
 
   async getCategory(req: Request, res: Response, next: NextFunction) {
     try {
-      // return next();
       const includeProducts = req.query.includeProducts === 'true';
       const includeTop3Products = req.query.includeTop3Products === 'top';
       const categoryId = +req.params.id;
@@ -102,16 +101,18 @@ class CategoryTypeOrmRepository implements ICategoryRepository {
           category.products = await AppDataSource.manager.find(SQLProduct, findOptions);
         }
       } else {
-        category = await AppDataSource.manager.find(SQLCategory, {
+        category = await AppDataSource.manager.findOne(SQLCategory, {
           where: {
             id: +req.params.id
           }
         });
       }
-      res.send(category);
+
+      if (category) {
+        res.send(category);
+      }
     } catch (e) {
-      res.sendStatus(500);
-      return next();
+      return next(e);
     }
   }
 }
