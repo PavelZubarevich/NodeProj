@@ -1,8 +1,9 @@
-import express from 'express';
+import express, { Response, Request, NextFunction } from 'express';
 import { productRouter, categoryRouter } from './routes';
 import { AppDataSource } from './db/postgresql';
 import { connect } from './db/mongo';
 import { APILogger, DBsLogger } from './logger';
+import { APIError } from './error/apiError';
 
 const app = express();
 const port = 3000;
@@ -26,9 +27,17 @@ try {
     });
   }
 } catch (err) {
-  developmentMode === 'production' && DBsLogger.error(err);
+  developmentMode !== 'production' && DBsLogger.error(err);
 }
 
 app.use(APILogger);
 app.use('/products', productRouter);
 app.use('/categories', categoryRouter);
+
+app.use((err: APIError, req: Request, res: Response, next: NextFunction) => {
+  res.status(err.statusCode || 500).format({
+    text: function () {
+      res.send(err.stack);
+    }
+  });
+});

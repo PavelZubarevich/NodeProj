@@ -5,16 +5,21 @@ import { ICategoryRepository } from '../types/types';
 import { AppDataSource } from '../db/postgresql';
 import { Types } from 'mongoose';
 import { FindManyOptions } from 'typeorm';
+import { APIError } from '../error/apiError';
+import { validationResult } from 'express-validator';
 
 const mongo = 'mongo';
 
 class CategoryTypegooseRepository implements ICategoryRepository {
   async all(req: Request, res: Response, next: NextFunction) {
     try {
-      const products = await MongoCategory.find({}, 'displayName');
-      res.send(products);
+      const category = await MongoCategory.find({}, 'displayName');
+      if (category.length > 0) {
+        res.send(category);
+      } else {
+        throw new APIError(404, 'Category does not exist');
+      }
     } catch (e) {
-      console.log(e);
       res.sendStatus(500);
       return next(new Error('err'));
     }
@@ -22,8 +27,13 @@ class CategoryTypegooseRepository implements ICategoryRepository {
 
   async getCategory(req: Request, res: Response, next: NextFunction) {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        throw new APIError(400, `Infalid query params: ${errors.array()[0].param}=${errors.array()[0].value}`);
+      }
+
       const includeProducts = req.query.includeProducts === 'true';
-      const includeTop3Products = req.query.includeTop3Products === 'top';
+      const includeTop3Products = req.query.includeTop3Products === 'true';
       let category = null;
 
       if (includeProducts) {
@@ -51,11 +61,13 @@ class CategoryTypegooseRepository implements ICategoryRepository {
       } else {
         category = await MongoCategory.find({ _id: req.params.id }, 'displayName');
       }
-      res.send(category);
+      if (category.length > 0) {
+        res.send(category);
+      } else {
+        throw new APIError(404, 'Category does not exist');
+      }
     } catch (e) {
-      console.log(e);
-      res.sendStatus(500);
-      return next(new Error('err'));
+      return next(e);
     }
   }
 }
@@ -72,8 +84,13 @@ class CategoryTypeOrmRepository implements ICategoryRepository {
 
   async getCategory(req: Request, res: Response, next: NextFunction) {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        throw new APIError(400, `Infalid query params: ${errors.array()[0].param}=${errors.array()[0].value}`);
+      }
+
       const includeProducts = req.query.includeProducts === 'true';
-      const includeTop3Products = req.query.includeTop3Products === 'top';
+      const includeTop3Products = req.query.includeTop3Products === 'true';
       const categoryId = +req.params.id;
       let category = null;
       if (includeProducts) {
@@ -108,8 +125,10 @@ class CategoryTypeOrmRepository implements ICategoryRepository {
         });
       }
 
-      if (category) {
+      if (category instanceof Object) {
         res.send(category);
+      } else {
+        throw new APIError(404, 'Category does not exist');
       }
     } catch (e) {
       return next(e);

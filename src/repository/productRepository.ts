@@ -12,12 +12,19 @@ import {
   LessThanOrEqual,
   FindOptionsOrderValue
 } from 'typeorm';
+import { APIError } from '../error/apiError';
+import { validationResult } from 'express-validator';
 
 const mongo = 'mongo';
 
 class ProductTypegooseRepository implements IProductRepository {
   async all(req: Request, res: Response, next: NextFunction) {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        throw new APIError(400, `Infalid query params: ${errors.array()[0].param}=${errors.array()[0].value}`);
+      }
+
       const query = req.query;
       const displayNameReg: RegExp = new RegExp(`${query.displayName}`);
       const prices: Array<string> = query.price?.toString().split(':') || [];
@@ -43,11 +50,14 @@ class ProductTypegooseRepository implements IProductRepository {
       }
 
       const products = await MongoProduct.find(findProps).sort(sortProps).skip(skip).limit(limit).exec();
-      res.send(products);
+
+      if (products.length > 0) {
+        res.send(products);
+      } else {
+        throw new APIError(404, 'Product does not exist');
+      }
     } catch (e) {
-      console.log(e);
-      res.sendStatus(500);
-      return next(new Error('err'));
+      return next(e);
     }
   }
 }
@@ -55,6 +65,11 @@ class ProductTypegooseRepository implements IProductRepository {
 class ProductTypeOrmRepository implements IProductRepository {
   async all(req: Request, res: Response, next: NextFunction) {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        throw new APIError(400, `Infalid query params: ${errors.array()[0].param}=${errors.array()[0].value}`);
+      }
+
       const query = req.query;
 
       const priceString = query.price?.toString() || ':';
@@ -83,9 +98,14 @@ class ProductTypeOrmRepository implements IProductRepository {
       query.offset && (findProps.skip = +query.offset);
       query.limit && (findProps.take = +query.limit);
       const products = await AppDataSource.manager.find(SQLProduct, findProps);
+      if (products.length > 0) {
+        res.send(products);
+      } else {
+        throw new APIError(404, 'Product does not exist');
+      }
       res.send(products);
     } catch (e) {
-      return next();
+      return next(e);
     }
   }
 }
