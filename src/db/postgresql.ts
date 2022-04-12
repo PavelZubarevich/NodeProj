@@ -4,11 +4,7 @@ import { SQLProduct, SQLCategory } from '../entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  host: 'localhost',
-  port: 5432,
-  username: 'postgres',
-  password: 'root',
-  database: 'node_lab',
+  url: process.env.DB_CONN_STRING,
   synchronize: true,
   logging: false,
   entities: [SQLProduct, SQLCategory],
