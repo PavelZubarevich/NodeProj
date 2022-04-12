@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node-dev src/index.ts",
-    "startSQL": "cross-env NODE_ENV=development DB=pg DB_CONN_STRING=postgres://localhost:5432/db npm start",
-    "startMongo": "cross-env NODE_ENV=development DB=mongo DB_CONN_STRING=mongodb://localhost:27017/db npm start",
-    "build": "tsc && nodemon dist/index.js",
+    "start:SQL": "cross-env NODE_ENV=development DB=pg DB_CONN_STRING=postgresql://postgres:root@localhost:5432/node_lab npm start",
+    "start:Mongo": "cross-env NODE_ENV=development DB=mongo DB_CONN_STRING=mongodb://localhost:27017/db npm start",
+    "build": "tsc && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install",
     "typeorm": "typeorm-ts-node-commonjs"
@@ -26,6 +26,7 @@
     "@typegoose/typegoose": "^9.7.1",
     "@types/mongoose": "^5.11.97",
     "express": "^4.17.3",
+    "express-validator": "^6.14.0",
     "express-winston": "^4.2.0",
     "mongodb": "^4.4.0",
     "mongoose": "^6.2.3",
