@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
 import { SQLProduct } from './Product';
 
 @Entity()
@@ -12,6 +12,6 @@ export class SQLCategory {
   @Column()
   createdAt?: Date;
 
-  @OneToMany(() => SQLProduct, (product) => product.category)
+  @ManyToMany(() => SQLProduct, (product) => product.categoryId)
   products?: SQLProduct[];
 }
