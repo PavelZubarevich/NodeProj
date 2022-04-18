@@ -7,6 +7,7 @@ import { APIError } from './error/apiError';
 import { graphqlHTTP } from 'express-graphql';
 import schema from './graphQL/schema';
 import { errors } from './graphQL/error';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const port = 3000;
@@ -33,6 +34,7 @@ try {
   developmentMode !== 'production' && DBsLogger.error(err);
 }
 
+app.use(cookieParser());
 app.use(APILogger);
 app.use('/products', productRouter);
 app.use('/categories', categoryRouter);
