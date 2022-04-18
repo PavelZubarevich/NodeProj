@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import { JWT_ACCESS_SECTER_KEY, JWT_REFRESH_SECTER_KEY } from '../../config';
 import { UserRepository } from '../../repository';
 import SessionRepository from '../../repository/sessionRepository';
-import { MongoSession } from '../../models';
 
 const generateTokens = (userId: any) => {
   const accessToken = jwt.sign({ userId }, JWT_ACCESS_SECTER_KEY, { expiresIn: '5m' });
