@@ -1,8 +1,10 @@
 import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLSchema, GraphQLList } from 'graphql';
-import { MongoUser, MongoSession } from '../../models';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { JWT_ACCESS_SECTER_KEY, JWT_REFRESH_SECTER_KEY } from '../../config';
+import { UserRepository } from '../../repository';
+import SessionRepository from '../../repository/sessionRepository';
+import { MongoSession } from '../../models';
 
 const generateTokens = (userId: any) => {
   const accessToken = jwt.sign({ userId }, JWT_ACCESS_SECTER_KEY, { expiresIn: '5m' });
@@ -46,7 +48,7 @@ const Mutation = new GraphQLObjectType({
         lastName: { type: GraphQLString, defaultValue: null }
       },
       async resolve(parent, { userName, password, firstName, lastName }, { req, res }) {
-        const user = await MongoUser.findOne({ userName }).exec();
+        const user = await UserRepository.getUser({ userName });
         if (user) {
           res.status(403);
           throw new Error('USER_ALREADY_EXISTS');
@@ -54,7 +56,7 @@ const Mutation = new GraphQLObjectType({
 
         const hashedPass = await bcrypt.hash(password, 10);
 
-        await MongoUser.create({ userName, password: hashedPass, firstName, lastName });
+        await UserRepository.addUser({ userName, password: hashedPass, firstName, lastName });
         return `User ${userName} added`;
       }
     },
@@ -65,7 +67,7 @@ const Mutation = new GraphQLObjectType({
         password: { type: GraphQLString }
       },
       async resolve(parent, { userName, password }, { req, res }) {
-        const user = await MongoUser.findOne({ userName }).exec();
+        const user = await UserRepository.getUser({ userName });
 
         if (!user) {
           res.status(401);
@@ -75,14 +77,13 @@ const Mutation = new GraphQLObjectType({
         const isValidPassword = await bcrypt.compare(password, user.password || '');
 
         if (isValidPassword) {
-          const { accessToken, refreshToken } = generateTokens(user._id);
+          const { accessToken, refreshToken } = generateTokens(user.id);
           res.cookie('RefreshToken', refreshToken, { httpOnly: true });
-          const sessionsForUser = await MongoSession.countDocuments({ userName });
+          const sessionsForUser = await SessionRepository.getCountByField({ userName });
           if (sessionsForUser >= 5) {
-            await MongoSession.findOneAndDelete({ userName }, { sort: { _id: -1 } });
+            await SessionRepository.findOneAndDelete({ userName }, { id: -1 });
           }
-
-          await MongoSession.create({ userName, refreshToken });
+          await SessionRepository.addSession({ userName, refreshToken });
           return accessToken;
         } else {
           res.status(401);
@@ -94,13 +95,65 @@ const Mutation = new GraphQLObjectType({
       type: GraphQLString,
       async resolve(parent, args, { req, res }) {
         const cookieTocken = req.headers.cookie.split('=')[1];
-        const session = MongoSession.findOne({ refreshToken: cookieTocken }).exec();
-        console.log(123, session);
-        // if (session) {
-        // const { accessToken, refreshToken } = generateTokens(user._id);
-        // }
+        const session = await SessionRepository.getSession({ refreshToken: cookieTocken });
 
-        return session;
+        if (session) {
+          const user = await UserRepository.getUser({ userName: session.userName });
+          if (user) {
+            const { accessToken, refreshToken } = generateTokens(user.id);
+            res.cookie('RefreshToken', refreshToken, { httpOnly: true });
+            SessionRepository.updateOne({ refreshToken: cookieTocken }, { refreshToken });
+            return accessToken;
+          }
+        }
+        return 'reject';
+      }
+    },
+    profile: {
+      type: GraphQLString,
+      args: {
+        accessToken: { type: GraphQLString },
+        firstName: { type: GraphQLString, defaultValue: null },
+        lastName: { type: GraphQLString, defaultValue: null }
+      },
+      async resolve(parent, { accessToken, firstName, lastName }, { res }) {
+        try {
+          const jwtData = jwt.verify(accessToken, JWT_ACCESS_SECTER_KEY);
+
+          if (jwtData) {
+            const newData: { firstName?: string; lastName?: string } = {};
+
+            firstName && (newData.firstName = firstName);
+            lastName && (newData.lastName = lastName);
+
+            await UserRepository.updateOne({ id: (<any>jwtData).userId }, newData);
+            return JSON.stringify(newData);
+          }
+        } catch (e: any) {
+          res.status(400);
+          throw new Error(e);
+        }
+      }
+    },
+    profilePassword: {
+      type: GraphQLString,
+      args: {
+        accessToken: { type: GraphQLString },
+        password: { type: GraphQLString }
+      },
+      async resolve(parent, { accessToken, password }, { res }) {
+        try {
+          const jwtData = jwt.verify(accessToken, JWT_ACCESS_SECTER_KEY);
+
+          if (jwtData) {
+            const hashedPass = await bcrypt.hash(password, 10);
+            await UserRepository.updateOne({ id: (<any>jwtData).userId }, { password: hashedPass });
+            return 'Password successfully changed';
+          }
+        } catch (e: any) {
+          res.status(400);
+          throw new Error(e.message);
+        }
       }
     }
   }
