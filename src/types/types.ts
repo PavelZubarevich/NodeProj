@@ -3,6 +3,28 @@ import { prop, index, Ref } from '@typegoose/typegoose';
 import { Response, Request, NextFunction } from 'express';
 import { FindOptionsOrderValue } from 'typeorm';
 
+export class SessionsClass {
+  @prop({ require: true })
+  public userName?: string;
+
+  @prop({ required: true })
+  public refreshToken?: string;
+}
+
+export class UserClass {
+  @prop({ unique: true, require: true })
+  public userName?: string;
+
+  @prop({ required: true })
+  public password?: string;
+
+  @prop()
+  public firstName?: string;
+
+  @prop()
+  public lastName?: string;
+}
+
 export class CategoryClass {
   @prop()
   public displayName?: string;
