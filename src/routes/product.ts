@@ -1,16 +1,8 @@
-import { Router, Response, Request } from 'express';
-import { Product } from '../models';
+import { Router } from 'express';
+import { ProductRepository } from '../repository';
 
 const productRouter = Router();
 
-productRouter.get('/', async (req: Request, res: Response) => {
-  const products = await Product.find();
-
-  if (products) {
-    res.send(products);
-  } else {
-    res.sendStatus(500);
-  }
-});
+productRouter.get('/', ProductRepository.all);
 
 export default productRouter;

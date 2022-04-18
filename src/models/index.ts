@@ -1,4 +1,4 @@
-import { Product } from './produst';
-import { Category } from './category';
+import { MongoProduct } from './produst';
+import { MongoCategory } from './category';
 
-export { Product, Category };
+export { MongoProduct, MongoCategory };
