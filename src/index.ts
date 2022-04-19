@@ -8,6 +8,8 @@ import { graphqlHTTP } from 'express-graphql';
 import schema from './graphQL/schema';
 import { errors } from './graphQL/error';
 import cookieParser from 'cookie-parser';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './swagger.json';
 
 const app = express();
 const port = 3000;
@@ -36,6 +38,7 @@ try {
 
 app.use(cookieParser());
 app.use(APILogger);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/products', productRouter);
 app.use('/categories', categoryRouter);
 app.use(
