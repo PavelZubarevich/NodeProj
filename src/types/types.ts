@@ -31,6 +31,9 @@ export class UserClass {
 
   @prop()
   public lastName?: string;
+
+  @prop({ default: 'buyer' })
+  public role?: string;
 }
 
 export class CategoryClass {
@@ -44,7 +47,7 @@ export class CategoryClass {
 @index({ totalRating: 1 })
 @index({ price: 1 })
 export class ProductClass {
-  @prop()
+  @prop({ unique: true })
   public displayName?: string;
 
   @prop({ ref: () => CategoryClass })
@@ -58,10 +61,25 @@ export class ProductClass {
 
   @prop()
   public price?: Number;
+
+  @prop()
+  public ratings?: {
+    userId: string;
+    rating: number;
+  }[];
+}
+
+export interface ExtendedProductClass extends ProductClass {
+  _id?: string;
+  'ratings.userId'?: string;
 }
 
 export interface IProductRepository {
   all(req: Request, res: Response, next: NextFunction): void;
+  getProductById(id: string): any;
+  updateRatings(productId: string, userId: string, ratings: Array<object>): any;
+  updateTotalRating(id: string): void;
+  deleteRating(productId: string, userId: string): void;
 }
 
 export interface ICategoryRepository {
@@ -81,6 +99,11 @@ export interface ISessionRepository {
   getCountByField(params: SessionsClass): any;
   findOneAndDelete(params: SessionsClass, sorting: ISortProps | ISQLSortProps): void;
   updateOne(findParams: SessionsClass, updateParams: SessionsClass): void;
+}
+
+export interface IProductController {
+  rateProduct(req: Request, res: Response, next: NextFunction): void;
+  deleteRating(req: Request, res: Response, next: NextFunction): void;
 }
 
 export interface ITotalRatingFilter {
