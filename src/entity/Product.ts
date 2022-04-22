@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index, ManyToMany, JoinTable } from 'typeorm';
-import { SQLCategory } from './Category';
+import { Entity, PrimaryGeneratedColumn, Column, Index, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import { SQLUserRating, SQLCategory } from './';
 
 @Entity()
 export class SQLProduct {
   @PrimaryGeneratedColumn()
-  id?: number;
+  _id?: number;
 
   @Column()
   displayName?: string;
@@ -23,4 +23,7 @@ export class SQLProduct {
   @ManyToMany(() => SQLCategory, (category) => category.products)
   @JoinTable()
   categoryId?: SQLCategory[];
+
+  @OneToMany(() => SQLUserRating, (rating) => rating.productId)
+  ratings?: SQLUserRating[];
 }

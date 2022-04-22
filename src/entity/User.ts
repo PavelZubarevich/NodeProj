@@ -1,9 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { SQLUserRating } from './';
 
 @Entity()
 export class SQLUser {
   @PrimaryGeneratedColumn()
-  id?: number;
+  _id?: number;
 
   @Column()
   userName?: string;
@@ -16,4 +17,10 @@ export class SQLUser {
 
   @Column({ nullable: true })
   lastName?: string;
+
+  @Column({ default: 'buyer' })
+  role?: string;
+
+  @OneToMany(() => SQLUserRating, (rating) => rating.userId)
+  ratings?: SQLUserRating[];
 }
