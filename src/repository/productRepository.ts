@@ -80,6 +80,7 @@ class ProductTypegooseRepository implements IProductRepository {
         },
         { returnDocument: 'after' }
       );
+      await this.updateTotalRating(id);
       return product;
     } catch (e) {
       throw new APIError(500, 'Internal server error');
@@ -213,6 +214,7 @@ class ProductTypeOrmRepository implements IProductRepository {
           rating: updateParams[0].rating
         }
       );
+      await this.updateTotalRating(id);
       return 'updated';
     } else {
       const user = await AppDataSource.manager.findOneOrFail(SQLUser, { where: { _id: +userId } });
@@ -223,6 +225,7 @@ class ProductTypeOrmRepository implements IProductRepository {
         productId: product,
         rating: updateParams[0].rating
       });
+      await this.updateTotalRating(id);
       return rating;
     }
   }
@@ -240,8 +243,6 @@ class ProductTypeOrmRepository implements IProductRepository {
             ratings: true
           }
         })) || {};
-
-      console.log(123, productRating);
 
       const totalRating = productRating.ratings?.reduce((acc, elem) => {
         return (acc += elem.rating || 0);
