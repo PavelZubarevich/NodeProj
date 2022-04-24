@@ -1,4 +1,4 @@
 import { getModelForClass } from '@typegoose/typegoose';
-import { OrderList } from '../types/mongoEntity';
+import { OrderListClass } from '../types/mongoEntity';
 
-export const MongoOrderList = getModelForClass(OrderList);
+export const MongoOrderList = getModelForClass(OrderListClass);

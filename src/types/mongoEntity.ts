@@ -58,10 +58,13 @@ export class ProductClass {
   }[];
 }
 
-export class OrderList {
+export class OrderListClass {
   @prop({ ref: () => ProductClass })
-  public products?: Ref<ProductClass>[];
+  public products?: {
+    product: Ref<ProductClass>[];
+    quantity: number;
+  };
 
-  @prop({ ref: () => UserClass })
-  public userId?: Ref<UserClass>;
+  @prop({ ref: () => UserClass, required: true })
+  public userId!: Ref<UserClass>;
 }

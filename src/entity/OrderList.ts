@@ -6,11 +6,14 @@ export class SQLOrderList {
   @PrimaryGeneratedColumn()
   _id?: number;
 
-  @OneToOne(() => SQLUser)
+  @OneToOne(() => SQLUser, { nullable: false })
   @JoinTable()
   user?: SQLUser;
 
   @ManyToMany(() => SQLProduct)
   @JoinTable()
-  products?: SQLProduct[];
+  products?: {
+    product: SQLProduct[];
+    quantity: number;
+  };
 }
