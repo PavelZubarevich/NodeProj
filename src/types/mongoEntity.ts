@@ -29,7 +29,7 @@ export class CategoryClass {
   @prop()
   public displayName?: string;
 
-  @prop()
+  @prop({ default: Date.now() })
   public createdAt?: Date;
 }
 
@@ -42,7 +42,7 @@ export class ProductClass {
   @prop({ ref: () => CategoryClass })
   public categoryId?: Ref<CategoryClass>[];
 
-  @prop()
+  @prop({ default: Date.now() })
   public createdAt?: Date;
 
   @prop()
@@ -56,4 +56,12 @@ export class ProductClass {
     userId: string;
     rating: number;
   }[];
+}
+
+export class OrderList {
+  @prop({ ref: () => ProductClass })
+  public products?: Ref<ProductClass>[];
+
+  @prop({ ref: () => UserClass })
+  public userId?: Ref<UserClass>;
 }
