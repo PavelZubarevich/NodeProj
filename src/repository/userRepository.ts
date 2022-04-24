@@ -1,4 +1,5 @@
-import { IUserRepository, UserClass } from '../types/types';
+import { IUserRepository } from '../types/repository';
+import { UserClass } from '../types/mongoEntity';
 import { SQLUser } from '../entity';
 import { MongoUser } from '../models';
 import { AppDataSource } from '../db/postgresql';

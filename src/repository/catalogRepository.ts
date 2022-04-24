@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from 'express';
 import { MongoCategory } from '../models';
 import { SQLCategory, SQLProduct } from '../entity';
-import { ICategoryRepository } from '../types/types';
+import { ICategoryRepository } from '../types/repository';
 import { AppDataSource } from '../db/postgresql';
 import { Types } from 'mongoose';
 import { FindManyOptions } from 'typeorm';

@@ -1,7 +1,8 @@
 import { Response, Request, NextFunction } from 'express';
 import { MongoProduct } from '../models';
 import { SQLProduct, SQLUser, SQLUserRating } from '../entity';
-import { IProductRepository, IFindProps, ITotalRatingFilter, ISortProps, ISQLSortProps } from '../types/types';
+import { IFindProps, ITotalRatingFilter, ISortProps, ISQLSortProps } from '../types/types';
+import { IProductRepository } from '../types/repository';
 import { AppDataSource } from '../db/postgresql';
 import {
   Like,
@@ -119,7 +120,7 @@ class ProductTypegooseRepository implements IProductRepository {
   async deleteRating(productId: string, userId: string) {
     try {
       const product = await this.getProductById(productId);
-      const ratings = product?.ratings?.filter((rating) => rating.userId !== userId) || [];
+      const ratings = product?.ratings?.filter((rating: SQLUserRating) => rating.userId !== userId) || [];
       const newProduct = await this.updateRatings(productId, userId, ratings);
 
       await this.updateTotalRating(productId);

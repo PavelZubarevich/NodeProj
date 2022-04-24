@@ -1,6 +1,8 @@
 import { MongoSession } from '../models';
 import { SQLSession } from '../entity';
-import { ISessionRepository, SessionsClass, ISortProps, ISQLSortProps } from '../types/types';
+import { ISortProps, ISQLSortProps } from '../types/types';
+import { SessionsClass } from '../types/mongoEntity';
+import { ISessionRepository } from '../types/repository';
 import { AppDataSource } from '../db/postgresql';
 
 const mongo = 'mongo';
