@@ -1,13 +1,13 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { SQLProduct, SQLCategory, SQLSession, SQLUser, SQLUserRating } from '../entity';
+import { SQLProduct, SQLCategory, SQLSession, SQLUser, SQLUserRating, SQLOrderList } from '../entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DB_CONN_STRING,
   synchronize: true,
   logging: false,
-  entities: [SQLProduct, SQLCategory, SQLSession, SQLUser, SQLUserRating],
+  entities: [SQLProduct, SQLCategory, SQLSession, SQLUser, SQLUserRating, SQLOrderList],
   migrations: [],
   subscribers: []
 });
