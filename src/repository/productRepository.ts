@@ -64,12 +64,11 @@ class ProductTypegooseRepository implements IProductRepository {
   }
 
   async getProductById(id: string) {
-    try {
-      const product = await MongoProduct.findById(id);
-      return product;
-    } catch (e) {
-      throw new APIError(500, 'Internal server error');
+    const product = await MongoProduct.findById(id);
+    if (!product) {
+      throw new APIError(404, 'Product does not exist');
     }
+    return product;
   }
 
   async updateRatings(id: string, userId: string, updateParams: Array<object>) {
@@ -181,12 +180,11 @@ class ProductTypeOrmRepository implements IProductRepository {
   }
 
   async getProductById(id: string) {
-    try {
-      const product = await AppDataSource.manager.findOneBy(SQLProduct, { _id: +id });
-      return product;
-    } catch (e) {
-      throw new APIError(500, 'Internal server error');
+    const product = await AppDataSource.manager.findOneBy(SQLProduct, { _id: +id });
+    if (!product) {
+      throw new APIError(404, 'Product does not exist');
     }
+    return product;
   }
 
   async updateRatings(id: string, userId: string, updateParams: Array<SQLUserRating>) {
