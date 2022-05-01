@@ -1,11 +1,9 @@
 import { Router } from 'express';
-import { ProductRepository } from '../repository';
-// import { body, query } from 'express-validator';
 import { ProductController } from '../controllers';
 
 const adminRouter = Router();
 
-adminRouter.get('/products/:id', ProductRepository.all);
+adminRouter.get('/products/:id', ProductController.getProductById);
 
 adminRouter.post('/products', ProductController.rateProduct);
 

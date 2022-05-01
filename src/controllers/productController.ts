@@ -61,6 +61,15 @@ class ProductController implements IProductController {
       return next(e);
     }
   }
+
+  async getProductById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const product = await ProductRepository.getProductById(req.params.id);
+      res.status(200).send(product);
+    } catch (e) {
+      return next(e);
+    }
+  }
 }
 
 export default new ProductController();
