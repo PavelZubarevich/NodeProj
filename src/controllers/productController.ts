@@ -70,6 +70,15 @@ class ProductController implements IProductController {
       return next(e);
     }
   }
+
+  async addProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+      const product = await ProductRepository.addProduct(req.body);
+      res.status(200).send(product);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export default new ProductController();
