@@ -10,6 +10,7 @@ export interface IProductRepository {
   updateTotalRating(id: string): void;
   deleteRating(productId: string, userId: string): void;
   addProduct(productData: ProductClass | SQLProduct): void;
+  deleteProductById(productId: string): void;
 }
 
 export interface ICategoryRepository {

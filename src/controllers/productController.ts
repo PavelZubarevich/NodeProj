@@ -79,6 +79,19 @@ class ProductController implements IProductController {
       next(e);
     }
   }
+
+  async deleteProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+      const product = await ProductRepository.deleteProductById(req.params.id);
+
+      if (!product) {
+        throw new APIError(404, 'Product does not exist');
+      }
+      res.status(200).send(product);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export default new ProductController();

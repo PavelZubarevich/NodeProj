@@ -18,6 +18,6 @@ adminRouter.post(
 
 adminRouter.patch('/products/:id', ProductController.deleteRating);
 
-adminRouter.delete('/products/:id', ProductController.deleteRating);
+adminRouter.delete('/products/:id', ProductController.deleteProduct);
 
 export default adminRouter;

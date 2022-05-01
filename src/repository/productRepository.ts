@@ -139,6 +139,11 @@ class ProductTypegooseRepository implements IProductRepository {
     });
     return product;
   }
+
+  async deleteProductById(productId: string) {
+    const product = await MongoProduct.findOneAndDelete({ _id: productId });
+    return product;
+  }
 }
 
 // ============================
@@ -300,6 +305,11 @@ class ProductTypeOrmRepository implements IProductRepository {
     });
 
     return product;
+  }
+
+  async deleteProductById(productId: string) {
+    await AppDataSource.manager.remove(SQLProduct, { _id: +productId });
+    return `Product ${productId} deleted`;
   }
 }
 
