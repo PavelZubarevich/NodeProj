@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, ManyToMany, OneToOne, JoinTable } from 'typeorm';
-import { SQLProduct, SQLUser } from '.';
+import { Entity, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn } from 'typeorm';
+import { SQLUser } from '.';
+import { SQLOrderProduct } from './OrderProduct';
 
 @Entity()
 export class SQLOrderList {
@@ -7,13 +8,10 @@ export class SQLOrderList {
   _id?: number;
 
   @OneToOne(() => SQLUser, { nullable: false })
-  @JoinTable()
-  user?: SQLUser;
+  @JoinColumn()
+  userId?: SQLUser;
 
-  @ManyToMany(() => SQLProduct)
-  @JoinTable()
-  products?: {
-    product: SQLProduct[];
-    quantity: number;
-  };
+  @OneToMany(() => SQLOrderProduct, (product) => product.orderListId, { nullable: true })
+  @JoinColumn()
+  products?: SQLOrderProduct[];
 }
