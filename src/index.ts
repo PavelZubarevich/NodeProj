@@ -1,5 +1,5 @@
 import express, { Response, Request, NextFunction } from 'express';
-import { productRouter, categoryRouter, orderListRouter } from './routes';
+import { productRouter, categoryRouter, orderListRouter, adminRouter } from './routes';
 import { AppDataSource } from './db/postgresql';
 import { connect } from './db/mongo';
 import { APILogger, DBsLogger } from './logger';
@@ -10,7 +10,7 @@ import { errors } from './graphQL/error';
 import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
-import { verifyUserMiddleware } from './helpers';
+import { verifyUserMiddleware, verifyAdminMiddleware } from './helpers';
 
 const app = express();
 const port = 3000;
@@ -44,6 +44,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/products', productRouter);
 app.use('/categories', categoryRouter);
 app.use('/order-list', verifyUserMiddleware, orderListRouter);
+app.use('/admin', verifyAdminMiddleware, adminRouter);
 app.use(
   '/graphql',
   graphqlHTTP((req, res) => ({
