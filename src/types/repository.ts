@@ -11,6 +11,7 @@ export interface IProductRepository {
   deleteRating(productId: string, userId: string): void;
   addProduct(productData: ProductClass | SQLProduct): void;
   deleteProductById(productId: string): void;
+  updateProduct(productId: string, data: IProductRepository | SQLProduct): void;
 }
 
 export interface ICategoryRepository {
