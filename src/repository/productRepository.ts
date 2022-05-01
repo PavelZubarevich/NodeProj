@@ -145,7 +145,7 @@ class ProductTypegooseRepository implements IProductRepository {
     return product;
   }
 
-  async updateProduct(productId: string, data: IProductRepository) {
+  async updateProduct(productId: string, data: ProductClass) {
     const product = await MongoProduct.findOneAndUpdate({ _id: productId }, data, {
       returnDocument: 'after'
     });

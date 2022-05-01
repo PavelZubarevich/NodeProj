@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ProductController } from '../controllers';
+import { ProductController, CategoryController } from '../controllers';
 import { body } from 'express-validator';
 import { validateQueryDataMiddleware } from '../helpers';
 
@@ -26,5 +26,21 @@ adminRouter.patch(
 );
 
 adminRouter.delete('/products/:id', ProductController.deleteProduct);
+
+adminRouter.post(
+  '/categories',
+  body('displayName').isString(),
+  validateQueryDataMiddleware,
+  CategoryController.addCategory
+);
+
+adminRouter.patch(
+  '/categories/:id',
+  body('displayName').isString(),
+  validateQueryDataMiddleware,
+  CategoryController.updateCategory
+);
+
+adminRouter.delete('/categories/:id', CategoryController.deleteCategory);
 
 export default adminRouter;
