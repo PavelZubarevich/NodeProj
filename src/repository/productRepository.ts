@@ -120,7 +120,7 @@ class ProductTypegooseRepository implements IProductRepository {
   async deleteRating(productId: string, userId: string) {
     try {
       const product = await this.getProductById(productId);
-      const ratings = product?.ratings?.filter((rating: SQLUserRating) => rating.userId !== userId) || [];
+      const ratings = product?.ratings?.filter((rating) => rating.userId !== userId) || [];
       const newProduct = await this.updateRatings(productId, userId, ratings);
 
       await this.updateTotalRating(productId);

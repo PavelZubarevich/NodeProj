@@ -12,6 +12,11 @@ class UserTypegooseRepository implements IUserRepository {
     return user;
   }
 
+  async getUserById(userId: string) {
+    const user = await MongoUser.findById(userId);
+    return user;
+  }
+
   async addUser(props: UserClass) {
     await MongoUser.create(props);
   }
@@ -24,6 +29,11 @@ class UserTypegooseRepository implements IUserRepository {
 class UserTypeOrmRepository implements IUserRepository {
   async getUser(params: UserClass) {
     const user = await AppDataSource.manager.findOne(SQLUser, { where: params });
+    return user;
+  }
+
+  async getUserById(userId: string) {
+    const user = await AppDataSource.manager.findOneBy(SQLUser, { _id: +userId });
     return user;
   }
 
