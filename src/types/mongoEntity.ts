@@ -59,12 +59,21 @@ export class ProductClass {
 }
 
 export class OrderListClass {
-  @prop({ ref: () => ProductClass })
-  public products?: {
-    product: Ref<ProductClass>[];
-    quantity: number;
-  };
+  @prop({ ref: () => OrderProduct })
+  // eslint-disable-next-line
+  public products?: Ref<OrderProduct>[];
 
-  @prop({ ref: () => UserClass, required: true })
+  @prop({ ref: () => UserClass, required: true, unique: true })
   public userId!: Ref<UserClass>;
+}
+
+export class OrderProduct {
+  @prop({ ref: () => ProductClass, required: true })
+  productId!: Ref<ProductClass>;
+
+  @prop({ ref: () => OrderListClass, required: true })
+  orderListId!: Ref<OrderListClass>;
+
+  @prop({ required: true })
+  quantity!: number;
 }
