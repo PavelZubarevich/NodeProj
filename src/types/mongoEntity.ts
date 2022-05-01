@@ -36,8 +36,8 @@ export class CategoryClass {
 @index({ totalRating: 1 })
 @index({ price: 1 })
 export class ProductClass {
-  @prop({ unique: true })
-  public displayName?: string;
+  @prop({ unique: true, required: true })
+  public displayName!: string;
 
   @prop({ ref: () => CategoryClass })
   public categoryId?: Ref<CategoryClass>[];
@@ -48,8 +48,8 @@ export class ProductClass {
   @prop()
   public totalRating?: Number;
 
-  @prop()
-  public price?: Number;
+  @prop({ required: true })
+  public price!: Number;
 
   @prop()
   public ratings?: {

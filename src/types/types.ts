@@ -19,6 +19,7 @@ export interface IProductController {
   rateProduct(req: Request, res: Response, next: NextFunction): void;
   deleteRating(req: Request, res: Response, next: NextFunction): void;
   getProductById(req: Request, res: Response, next: NextFunction): void;
+  addProduct(req: Request, res: Response, next: NextFunction): void;
 }
 
 export interface ITotalRatingFilter {
