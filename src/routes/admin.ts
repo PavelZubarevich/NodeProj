@@ -16,7 +16,14 @@ adminRouter.post(
   ProductController.addProduct
 );
 
-adminRouter.patch('/products/:id', ProductController.deleteRating);
+adminRouter.patch(
+  '/products/:id',
+  body('displayName').isString(),
+  body('price').isFloat({ min: 0 }),
+  body('categoryId').isArray().optional(),
+  validateQueryDataMiddleware,
+  ProductController.updateProduct
+);
 
 adminRouter.delete('/products/:id', ProductController.deleteProduct);
 

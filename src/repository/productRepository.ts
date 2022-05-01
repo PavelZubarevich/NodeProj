@@ -144,6 +144,13 @@ class ProductTypegooseRepository implements IProductRepository {
     const product = await MongoProduct.findOneAndDelete({ _id: productId });
     return product;
   }
+
+  async updateProduct(productId: string, data: IProductRepository) {
+    const product = await MongoProduct.findOneAndUpdate({ _id: productId }, data, {
+      returnDocument: 'after'
+    });
+    return product;
+  }
 }
 
 // ============================
@@ -310,6 +317,33 @@ class ProductTypeOrmRepository implements IProductRepository {
   async deleteProductById(productId: string) {
     await AppDataSource.manager.remove(SQLProduct, { _id: +productId });
     return `Product ${productId} deleted`;
+  }
+
+  async updateProduct(productId: string, data: SQLProduct) {
+    const categories = [];
+
+    if (data.categoryId?.length) {
+      for (const categoryId of data.categoryId) {
+        const category = await AppDataSource.manager.findOneBy(SQLCategory, { id: +categoryId });
+        if (category) {
+          categories.push(category);
+        } else {
+          throw new APIError(404, `Category ${categoryId} does noe exist`);
+        }
+      }
+    }
+
+    const product = await AppDataSource.manager.findOneBy(SQLProduct, { _id: +productId });
+
+    const newProduct = await AppDataSource.manager.save(SQLProduct, {
+      _id: product?._id,
+      totalRating: product?.totalRating,
+      ratings: product?.ratings,
+      displayName: data.displayName,
+      price: data.price,
+      categoryId: categories
+    });
+    return newProduct;
   }
 }
 
