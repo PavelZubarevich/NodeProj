@@ -29,3 +29,15 @@ export interface IFindProps {
   totalRating?: Object;
   price?: ITotalRatingFilter;
 }
+
+export interface IOrderListController {
+  addProductToOrder(req: Request, res: Response, next: NextFunction): any;
+  updateOrder(req: Request, res: Response, next: NextFunction): any;
+  deleteOrderList(req: Request, res: Response, next: NextFunction): any;
+}
+
+export interface IOrderProduct {
+  productId?: string;
+  orderListId?: string;
+  quantity?: number;
+}
