@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from 'express';
 import { MongoProduct } from '../models';
-import { SQLProduct, SQLUser, SQLUserRating } from '../entity';
+import { SQLCategory, SQLProduct, SQLUser, SQLUserRating } from '../entity';
 import { IFindProps, ITotalRatingFilter, ISortProps, ISQLSortProps } from '../types/types';
 import { IProductRepository } from '../types/repository';
 import { AppDataSource } from '../db/postgresql';
@@ -16,6 +16,7 @@ import {
 import { APIError } from '../error/apiError';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
+import { ProductClass } from '../types/mongoEntity';
 
 const mongo = 'mongo';
 
@@ -127,6 +128,16 @@ class ProductTypegooseRepository implements IProductRepository {
     } catch (e) {
       throw new APIError(500, 'Internal server error');
     }
+  }
+
+  async addProduct(productData: ProductClass) {
+    const product = await MongoProduct.create({
+      displayName: productData.displayName,
+      createdAt: Date.now(),
+      categoryId: productData.categoryId,
+      price: productData.price
+    });
+    return product;
   }
 }
 
@@ -265,6 +276,30 @@ class ProductTypeOrmRepository implements IProductRepository {
       });
       await this.updateTotalRating(productId);
     } catch (e) {}
+  }
+
+  async addProduct(productData: SQLProduct) {
+    const categories = [];
+
+    if (productData.categoryId?.length) {
+      for (const categoryId of productData.categoryId) {
+        const category = await AppDataSource.manager.findOneBy(SQLCategory, { id: +categoryId });
+        if (category) {
+          categories.push(category);
+        } else {
+          throw new APIError(404, `Category ${categoryId} does noe exist`);
+        }
+      }
+    }
+
+    const product = await AppDataSource.manager.save(SQLProduct, {
+      displayName: productData.displayName,
+      price: productData.price,
+      categoryId: categories,
+      totalRating: 0
+    });
+
+    return product;
   }
 }
 
