@@ -12,6 +12,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
 import { verifyUserMiddleware, verifyAdminMiddleware } from './helpers';
 import { WebSocketServer } from 'ws';
+import { ProductRatingsController } from './controllers';
 import { ProductRatingsRepository } from './repository';
 
 const wss = new WebSocketServer({ port: 8080 }, () => console.log('WS starter on port 8080'));
@@ -59,6 +60,7 @@ app.use('/products', productRouter);
 app.use('/categories', categoryRouter);
 app.use('/order-list', verifyUserMiddleware, orderListRouter);
 app.use('/admin', verifyAdminMiddleware, adminRouter);
+app.get('/lastRatings', ProductRatingsController.getLatestRatings);
 app.use(
   '/graphql',
   graphqlHTTP((req, res) => ({
