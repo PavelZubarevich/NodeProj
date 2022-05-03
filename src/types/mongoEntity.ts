@@ -55,6 +55,7 @@ export class ProductClass {
   public ratings?: {
     userId: string;
     rating: number;
+    createdAt: Date;
   }[];
 }
 
