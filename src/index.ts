@@ -11,6 +11,20 @@ import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
 import { verifyUserMiddleware, verifyAdminMiddleware } from './helpers';
+import { WebSocketServer } from 'ws';
+import { ProductRatingsRepository } from './repository';
+
+const wss = new WebSocketServer({ port: 8080 }, () => console.log('WS starter on port 8080'));
+
+wss.on('connection', function connection(ws) {
+  ws.on('message', async function message(data: any) {
+    const ratings = await ProductRatingsRepository.getLatestRatings();
+
+    wss.clients.forEach((client) => {
+      client.send(JSON.stringify(ratings));
+    });
+  });
+});
 
 const app = express();
 const port = 3000;
