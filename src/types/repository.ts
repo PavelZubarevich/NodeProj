@@ -14,6 +14,10 @@ export interface IProductRepository {
   updateProduct(productId: string, data: ProductClass | SQLProduct): void;
 }
 
+export interface IProductRatingsRepository {
+  getLatestRatings(): void;
+}
+
 export interface ICategoryRepository {
   all(req: Request, res: Response, next: NextFunction): void;
   getCategory(req: Request, res: Response, next: NextFunction): void;
