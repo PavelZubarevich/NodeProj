@@ -8,6 +8,10 @@ class ProductRatingsController implements IProductRatingsController {
 
     res.status(200).send(ratings);
   }
+
+  async deleteRatings() {
+    await ProductRatingsRepository.deleteRatings();
+  }
 }
 
 export default new ProductRatingsController();
