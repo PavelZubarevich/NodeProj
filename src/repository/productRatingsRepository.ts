@@ -1,6 +1,5 @@
-import { MongoProduct } from '../models';
-import { SQLUserRating } from '../entity';
-import { IUserRating } from '../types/types';
+import { MongoLastRatings } from '../models';
+import { SQLLastRating } from '../entity';
 import { IProductRatingsRepository } from '../types/repository';
 import { AppDataSource } from '../db/postgresql';
 
@@ -8,27 +7,17 @@ const mongo = 'mongo';
 
 class ProductRatingsTypegooseRepository implements IProductRatingsRepository {
   async getLatestRatings() {
-    const products = await MongoProduct.find().sort({ 'ratings.createdAt': -1 }).limit(10);
-    let ratings: Array<IUserRating> = [];
-
-    products.forEach((product) => {
-      if (product.ratings?.length) {
-        ratings.push(...product.ratings);
-      }
-    });
-
-    ratings = ratings.sort((a, b) => {
-      if (a.createdAt < b.createdAt) {
-        return 1;
-      }
-      if (a.createdAt > b.createdAt) {
-        return -1;
-      }
-
-      return 0;
-    });
+    const ratings = await MongoLastRatings.find().sort({ createdAt: -1 }).limit(10);
 
     return ratings;
+  }
+
+  async deleteRatings() {
+    await MongoLastRatings.remove({
+      _id: {
+        $in: (await MongoLastRatings.find().sort({ createdAt: -1 }).skip(10)).map((a: any) => a._id)
+      }
+    });
   }
 }
 
@@ -36,13 +25,31 @@ class ProductRatingsTypegooseRepository implements IProductRatingsRepository {
 
 class ProductRatingsTypeOrmRepository implements IProductRatingsRepository {
   async getLatestRatings() {
-    const ratings = await AppDataSource.manager.find(SQLUserRating, {
+    const ratings = await AppDataSource.manager.find(SQLLastRating, {
       relations: { productId: true },
       order: { createdAt: -1 },
       take: 10
     });
 
     return ratings;
+  }
+
+  async deleteRatings() {
+    await AppDataSource.manager
+      .getRepository(SQLLastRating)
+      .createQueryBuilder('last_ratings')
+      .delete()
+      .where(
+        (qb: any) =>
+          `_id IN (${qb
+            .createQueryBuilder()
+            .select('_id')
+            .from(SQLLastRating, 'last_ratings')
+            .orderBy('last_ratings."createdAt"', 'DESC')
+            .skip(10)
+            .getQuery()})`
+      )
+      .execute();
   }
 }
 
