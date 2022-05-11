@@ -342,3 +342,96 @@ describe('testing admin routes', () => {
     });
   });
 });
+
+describe('testing category routes', () => {
+  let uri;
+  let mongo;
+  let productId;
+
+  beforeAll(async () => {
+    [mongo, uri] = await mongoInit();
+    await dbConnect(uri);
+  });
+
+  afterAll(async () => {
+    await dbDisconnect(mongo);
+  });
+
+  describe('Test get categories method', () => {
+    it('GET /categories - success', async () => {
+      await MongoCategory.create({
+        displayName: 'getTest'
+      });
+      await MongoCategory.create({
+        displayName: 'getTest1'
+      });
+
+      const response = await request(app).get('/categories');
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual([
+        {
+          _id: expect.any(String),
+          displayName: 'getTest'
+        },
+        {
+          _id: expect.any(String),
+          displayName: 'getTest1'
+        }
+      ]);
+    });
+  });
+
+  describe('Test get category by id method', () => {
+    beforeEach(() => {
+      productId = new mongoose.Types.ObjectId();
+    });
+
+    it('GET /categories/:id - success', async () => {
+      await MongoCategory.create({
+        _id: productId,
+        displayName: 'getTest'
+      });
+
+      const response = await request(app).get(`/categories/${productId}`);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual([
+        {
+          _id: expect.any(String),
+          displayName: 'getTest'
+        }
+      ]);
+    });
+
+    it('GET /categories/:id?includeProducts=true - success', async () => {
+      await MongoCategory.create({
+        _id: productId,
+        displayName: 'getTestwithProducts'
+      });
+
+      await MongoProduct.create({
+        displayName: 'product',
+        categoryId: [productId],
+        price: 1
+      });
+
+      const response = await request(app).get(`/categories/${productId}?includeProducts=true`);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual([
+        {
+          _id: expect.any(String),
+          displayName: 'getTestwithProducts',
+          products: [{ displayName: 'product', price: 1 }],
+          __v: 0
+        }
+      ]);
+    });
+
+    it('GET /categories/:id - should return category does not exist err', async () => {
+      const response = await request(app).get('/categories/6242efa661a153abae8eb7bb');
+      expect(response.statusCode).toBe(404);
+    });
+  });
+});
