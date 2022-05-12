@@ -13,7 +13,7 @@ import {
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  ssl: true,
+  ssl: { rejectUnauthorized: false },
   url: process.env.DATABASE_URL,
   synchronize: true,
   logging: false,
