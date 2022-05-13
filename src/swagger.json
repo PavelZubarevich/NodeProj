@@ -15,6 +15,10 @@
       "description": "Operations about categories"
     },
     {
+      "name": "admin",
+      "description": "Admin operations"
+    },
+    {
       "name": "graphQL",
       "description": "Operations about graphQL"
     }
@@ -88,6 +92,63 @@
           },
           "400": {
             "description": "Infalid query params"
+          },
+          "404": {
+            "description": "Products not exist"
+          }
+        }
+      }
+    },
+    "/products/{productId}/rate": {
+      "post": {
+        "tags": ["product"],
+        "summary": "Rate product",
+        "description": "Rate Product",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "product id to be rated",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "rating",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "rating": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ProductWithRatings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Infalid token"
           },
           "404": {
             "description": "Products not exist"
@@ -218,6 +279,229 @@
           }
         }
       }
+    },
+    "/admin/products/{productId}": {
+      "get": {
+        "tags": ["admin"],
+        "summary": "Get product by id",
+        "description": "Return product by id",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "product id to be found",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ProductWithRatings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Infalid query params"
+          },
+          "401": {
+            "description": "Infalid token"
+          },
+          "403": {
+            "description": "Admin only"
+          },
+          "404": {
+            "description": "Products not exist"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["admin"],
+        "summary": "Update product",
+        "description": "Update product",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "product id to be found",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "Product data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "displayName": {
+                  "type": "string"
+                },
+                "price": {
+                  "type": "number"
+                },
+                "categoryId": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ProductWithRatings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Infalid token"
+          },
+          "403": {
+            "description": "Admin only"
+          },
+          "404": {
+            "description": "Products not exist"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["admin"],
+        "summary": "Delete product",
+        "description": "Delete product",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "product id to be found",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ProductWithRatings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Infalid token"
+          },
+          "403": {
+            "description": "Admin only"
+          },
+          "404": {
+            "description": "Products not exist"
+          }
+        }
+      }
+    },
+    "/admin/products": {
+      "post": {
+        "tags": ["admin"],
+        "summary": "Add product",
+        "description": "Add product",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "description": "Product data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "displayName": {
+                  "type": "string"
+                },
+                "price": {
+                  "type": "number"
+                },
+                "categoryId": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ProductWithRatings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Infalid query params"
+          },
+          "401": {
+            "description": "Infalid token"
+          },
+          "403": {
+            "description": "Admin only"
+          },
+          "404": {
+            "description": "Products not exist"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -288,6 +572,47 @@
           },
           "price": {
             "type": "number"
+          }
+        },
+        "xml": {
+          "name": "Product"
+        }
+      },
+      "ProductWithRatings": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "totalRating": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number"
+          },
+          "ratings": {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "type": "string"
+              },
+              "rating": {
+                "type": "number"
+              }
+            }
           }
         },
         "xml": {
