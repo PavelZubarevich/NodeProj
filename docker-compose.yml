@@ -1,7 +1,6 @@
 version: '3.1'
 
 services:
-
   mongo:
     image: mongo
     restart: always
@@ -45,5 +44,4 @@ services:
       MONGO_DATABASE_URL: mongodb://root:example@mongo:27017/
       DATABASE_URL: postgres://root:example@db:5432/root
       DB: pg
-      DB_SSL: true
-
+      DB_SSL: false
