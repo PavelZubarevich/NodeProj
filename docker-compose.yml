@@ -1,23 +1,6 @@
 version: '3.1'
 
 services:
-  mongo:
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
-
   db:
     image: postgres
     restart: always
@@ -39,9 +22,6 @@ services:
     links:
       - db
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      MONGO_DATABASE_URL: mongodb://root:example@mongo:27017/
+      MONGO_DATABASE_URL: mongodb+srv://root:root@cluster0.yfx9l.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
       DATABASE_URL: postgres://root:example@db:5432/root
-      DB: pg
-      DB_SSL: false
+      DB: mongo
