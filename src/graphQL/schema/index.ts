@@ -1,10 +1,24 @@
-import { GraphQLObjectType, GraphQLID, GraphQLString, GraphQLSchema, GraphQLList, GraphQLInt } from 'graphql';
+import {
+  GraphQLObjectType,
+  GraphQLID,
+  GraphQLString,
+  GraphQLSchema,
+  GraphQLList,
+  GraphQLInt,
+  GraphQLInputObjectType
+} from 'graphql';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { JWT_ACCESS_SECTER_KEY, JWT_REFRESH_SECTER_KEY } from '../../config';
-import { UserRepository, ProductRepository } from '../../repository';
-import SessionRepository from '../../repository/sessionRepository';
+import {
+  UserRepository,
+  ProductRepository,
+  SessionRepository,
+  OrderProductRepository,
+  OrderListRepository
+} from '../../repository';
 import { APIError } from '../../error/apiError';
+import 'reflect-metadata';
 
 const generateTokens = (userId: string, userRole: string | undefined) => {
   const accessToken = jwt.sign({ userId, userRole }, JWT_ACCESS_SECTER_KEY, { expiresIn: '15m' });
@@ -21,6 +35,14 @@ const UserType = new GraphQLObjectType({
     _id: { type: GraphQLID },
     userName: { type: GraphQLString },
     password: { type: GraphQLString }
+  })
+});
+
+const ProductType = new GraphQLInputObjectType({
+  name: 'Product',
+  fields: () => ({
+    productId: { type: GraphQLString },
+    quantity: { type: GraphQLInt }
   })
 });
 
@@ -187,7 +209,7 @@ const Mutation = new GraphQLObjectType({
                 return rating;
               });
               if (!isRated) {
-                ratings.push({ userId: (<any>user).userId, rating: rating });
+                ratings.push({ userId: (<any>user).userId, rating: rating, createdAt: new Date() });
               }
             } else {
               throw new APIError(404, 'PRODUCT_NOT_FOUND');
@@ -220,6 +242,113 @@ const Mutation = new GraphQLObjectType({
             await ProductRepository.deleteRating(productId, (<any>user).userId);
             return 'success';
           }
+        } catch (e: any) {
+          if (e.statusCode) {
+            res.status(e.statusCode);
+          }
+          throw new Error(e.message);
+        }
+      }
+    },
+
+    addProductsToOrder: {
+      type: GraphQLString,
+      args: {
+        accessToken: { type: GraphQLString },
+        products: { type: new GraphQLList(ProductType) }
+      },
+      async resolve(parent, { accessToken, products }, { res }) {
+        try {
+          let response;
+
+          const user = jwt.verify(accessToken, JWT_ACCESS_SECTER_KEY);
+
+          const order = await OrderListRepository.getOrderByUserId((<any>user).userId);
+
+          if (order) {
+            const productIds = [];
+
+            for (const product of products) {
+              const dbProduct = await OrderProductRepository.updateOrInsertProduct(
+                { productId: product.productId, orderListId: order._id },
+                { quantity: product.quantity }
+              );
+              productIds.push(dbProduct._id);
+            }
+            response = await OrderListRepository.updateOrderProducts(order, productIds);
+          } else {
+            const order = await OrderListRepository.createOrder((<any>user).userId);
+            if (order) {
+              const productsPayload = products.map((product: any) => {
+                product.orderListId = order._id;
+                return product;
+              });
+
+              const dbProducts = await OrderProductRepository.addProducts(productsPayload);
+
+              const productIds = dbProducts.map((product) => {
+                return product._id;
+              });
+
+              response = await OrderListRepository.updateOrderProducts(order, productIds);
+            }
+          }
+          return JSON.stringify(response);
+        } catch (e: any) {
+          if (e.statusCode) {
+            res.status(e.statusCode);
+          }
+          throw new Error(e.message);
+        }
+      }
+    },
+
+    removeOrder: {
+      type: GraphQLString,
+      args: {
+        accessToken: { type: GraphQLString }
+      },
+      async resolve(parent, { accessToken, productId }, { res }) {
+        try {
+          const user = jwt.verify(accessToken, JWT_ACCESS_SECTER_KEY);
+
+          const order = await OrderListRepository.getOrderByUserId((<any>user).userId);
+
+          if (order) {
+            await OrderProductRepository.deleteAllProducts(order);
+            await OrderListRepository.deleteOrderById(order._id);
+          } else {
+            throw new APIError(404, 'Order List does not exist');
+          }
+        } catch (e: any) {
+          if (e.statusCode) {
+            res.status(e.statusCode);
+          }
+          throw new Error(e.message);
+        }
+      }
+    },
+    updateProductsInOrder: {
+      type: GraphQLString,
+      args: {
+        accessToken: { type: GraphQLString },
+        products: { type: new GraphQLList(ProductType) }
+      },
+      async resolve(parent, { accessToken, products }, { res }) {
+        try {
+          const user = jwt.verify(accessToken, JWT_ACCESS_SECTER_KEY);
+
+          let response;
+
+          const order = await OrderListRepository.getOrderByUserId((<any>user).userId);
+
+          if (order) {
+            response = await OrderProductRepository.updateProducts(order, products);
+          } else {
+            throw new APIError(404, 'Order does not exists');
+          }
+
+          return JSON.stringify(response);
         } catch (e: any) {
           if (e.statusCode) {
             res.status(e.statusCode);

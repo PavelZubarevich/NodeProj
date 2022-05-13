@@ -4,6 +4,7 @@ import UserRepository from './userRepository';
 import OrderListRepository from './orderListRepository';
 import OrderProductRepository from './orderProductRepository';
 import ProductRatingsRepository from './productRatingsRepository';
+import SessionRepository from './sessionRepository';
 
 export {
   ProductRepository,
@@ -11,5 +12,6 @@ export {
   UserRepository,
   OrderListRepository,
   OrderProductRepository,
-  ProductRatingsRepository
+  ProductRatingsRepository,
+  SessionRepository
 };
