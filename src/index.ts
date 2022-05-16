@@ -4,6 +4,10 @@ import { AppDataSource } from './db/postgresql';
 import { connect } from './db/mongo';
 import { APILogger, DBsLogger } from './logger';
 import { APIError } from './error/apiError';
+import { graphqlHTTP } from 'express-graphql';
+import schema from './graphQL/schema';
+import { errors } from './graphQL/error';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const port = 3000;
@@ -30,9 +34,28 @@ try {
   developmentMode !== 'production' && DBsLogger.error(err);
 }
 
+app.use(cookieParser());
 app.use(APILogger);
 app.use('/products', productRouter);
 app.use('/categories', categoryRouter);
+app.use(
+  '/graphql',
+  graphqlHTTP((req, res) => ({
+    schema: schema,
+    // rootValue: root,
+    // graphiql: true,
+    context: { req, res },
+    customFormatErrorFn: (e) => {
+      const error = errors[e.message];
+
+      if (error) {
+        return { message: error.message, statusCode: error.statusCode };
+      } else {
+        return e;
+      }
+    }
+  }))
+);
 
 app.use((err: APIError, req: Request, res: Response, next: NextFunction) => {
   res.status(err.statusCode || 500).format({
