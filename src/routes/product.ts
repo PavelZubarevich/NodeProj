@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { ProductRepository } from '../repository';
-import { query } from 'express-validator';
+import { body, query } from 'express-validator';
+import { ProductController } from '../controllers';
 
 const productRouter = Router();
 
@@ -39,5 +40,14 @@ productRouter.get(
     .optional(),
   ProductRepository.all
 );
+
+productRouter.post(
+  '/:id/rate',
+  body('rating').isFloat({ min: 0, max: 10 }),
+  body('comment').isString().optional(),
+  ProductController.rateProduct
+);
+
+productRouter.delete('/:id/rate', ProductController.deleteRating);
 
 export default productRouter;

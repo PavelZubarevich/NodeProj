@@ -36,6 +36,7 @@ try {
   developmentMode !== 'production' && DBsLogger.error(err);
 }
 
+app.use(express.json());
 app.use(cookieParser());
 app.use(APILogger);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -45,8 +46,6 @@ app.use(
   '/graphql',
   graphqlHTTP((req, res) => ({
     schema: schema,
-    // rootValue: root,
-    // graphiql: true,
     context: { req, res },
     customFormatErrorFn: (e) => {
       const error = errors[e.message];
@@ -54,13 +53,20 @@ app.use(
       if (error) {
         return { message: error.message, statusCode: error.statusCode };
       } else {
-        return e;
+        if (e.message.toLocaleLowerCase().includes('jwt')) {
+          return { message: e.message, statusCode: 401 };
+        }
+        return { message: e.message, statusCode: 500 };
       }
     }
   }))
 );
 
 app.use((err: APIError, req: Request, res: Response, next: NextFunction) => {
+  if (err.name.toLocaleLowerCase().includes('token')) {
+    err.statusCode = 401;
+  }
+
   res.status(err.statusCode || 500).format({
     text: function () {
       res.send(err.stack);

@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from 'express';
 import { MongoProduct } from '../models';
-import { SQLProduct } from '../entity';
+import { SQLProduct, SQLUser, SQLUserRating } from '../entity';
 import { IProductRepository, IFindProps, ITotalRatingFilter, ISortProps, ISQLSortProps } from '../types/types';
 import { AppDataSource } from '../db/postgresql';
 import {
@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 import { APIError } from '../error/apiError';
 import { validationResult } from 'express-validator';
+import mongoose from 'mongoose';
 
 const mongo = 'mongo';
 
@@ -60,7 +61,76 @@ class ProductTypegooseRepository implements IProductRepository {
       return next(e);
     }
   }
+
+  async getProductById(id: string) {
+    try {
+      const product = await MongoProduct.findById(id);
+      return product;
+    } catch (e) {
+      throw new APIError(500, 'Internal server error');
+    }
+  }
+
+  async updateRatings(id: string, userId: string, updateParams: Array<object>) {
+    try {
+      const product = await MongoProduct.findOneAndUpdate(
+        { _id: id },
+        {
+          $set: { ratings: updateParams }
+        },
+        { returnDocument: 'after' }
+      );
+      await this.updateTotalRating(id);
+      return product;
+    } catch (e) {
+      throw new APIError(500, 'Internal server error');
+    }
+  }
+
+  async updateTotalRating(id: string) {
+    try {
+      const [rating] = await MongoProduct.aggregate([
+        { $match: { _id: new mongoose.Types.ObjectId(id) } },
+        { $unwind: '$ratings' },
+        {
+          $group: {
+            _id: null,
+            totalRating: { $sum: '$ratings.rating' }
+          }
+        }
+      ]);
+      let totalRating = 0;
+
+      if (rating) {
+        totalRating = rating.totalRating;
+      }
+
+      await MongoProduct.findOneAndUpdate(
+        { _id: id },
+        {
+          $set: { totalRating }
+        }
+      );
+    } catch (e) {
+      throw new APIError(500, 'Internal server error');
+    }
+  }
+
+  async deleteRating(productId: string, userId: string) {
+    try {
+      const product = await this.getProductById(productId);
+      const ratings = product?.ratings?.filter((rating) => rating.userId !== userId) || [];
+      const newProduct = await this.updateRatings(productId, userId, ratings);
+
+      await this.updateTotalRating(productId);
+      return newProduct;
+    } catch (e) {
+      throw new APIError(500, 'Internal server error');
+    }
+  }
 }
+
+// ============================
 
 class ProductTypeOrmRepository implements IProductRepository {
   async all(req: Request, res: Response, next: NextFunction) {
@@ -107,6 +177,95 @@ class ProductTypeOrmRepository implements IProductRepository {
     } catch (e) {
       return next(e);
     }
+  }
+
+  async getProductById(id: string) {
+    try {
+      const product = await AppDataSource.manager.findOneBy(SQLProduct, { _id: +id });
+      return product;
+    } catch (e) {
+      throw new APIError(500, 'Internal server error');
+    }
+  }
+
+  async updateRatings(id: string, userId: string, updateParams: Array<SQLUserRating>) {
+    const ratedProduct = await AppDataSource.manager.findOne(SQLProduct, {
+      relations: { ratings: true },
+      where: {
+        _id: +id,
+        ratings: {
+          userId: {
+            _id: +userId
+          }
+        }
+      }
+    });
+
+    const userRatings = ratedProduct?.ratings || [];
+    const userRatingId = userRatings[0]?._id;
+
+    if (userRatingId) {
+      await AppDataSource.manager.update(
+        SQLUserRating,
+        {
+          _id: userRatingId
+        },
+        {
+          rating: updateParams[0].rating
+        }
+      );
+      await this.updateTotalRating(id);
+      return 'updated';
+    } else {
+      const user = await AppDataSource.manager.findOneOrFail(SQLUser, { where: { _id: +userId } });
+      const product = await AppDataSource.manager.findOneOrFail(SQLProduct, { where: { _id: +id } });
+
+      const rating = await AppDataSource.getRepository(SQLUserRating).save({
+        userId: user,
+        productId: product,
+        rating: updateParams[0].rating
+      });
+      await this.updateTotalRating(id);
+      return rating;
+    }
+  }
+
+  async updateTotalRating(id: string) {
+    try {
+      const productRating =
+        (await AppDataSource.manager.findOne(SQLProduct, {
+          relations: {
+            ratings: true
+          },
+          where: { _id: +id },
+          select: {
+            _id: true,
+            ratings: true
+          }
+        })) || {};
+
+      const totalRating = productRating.ratings?.reduce((acc, elem) => {
+        return (acc += elem.rating || 0);
+      }, 0);
+
+      await AppDataSource.manager.update(SQLProduct, { _id: +id }, { totalRating });
+    } catch (e) {
+      throw new APIError(500, 'Internal server error');
+    }
+  }
+
+  async deleteRating(productId: string, userId: string) {
+    try {
+      await AppDataSource.manager.delete(SQLUserRating, {
+        userId: {
+          _id: +userId
+        },
+        productId: {
+          _id: +productId
+        }
+      });
+      await this.updateTotalRating(productId);
+    } catch (e) {}
   }
 }
 
