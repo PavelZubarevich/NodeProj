@@ -1,0 +1,341 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Node-lab server desc",
+    "version": "1.0.0",
+    "title": "Node Lab"
+  },
+  "tags": [
+    {
+      "name": "product",
+      "description": "Operations about products"
+    },
+    {
+      "name": "categories",
+      "description": "Operations about categories"
+    },
+    {
+      "name": "graphQL",
+      "description": "Operations about graphQL"
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development local server"
+    }
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "tags": ["product"],
+        "summary": "Get all products",
+        "description": "Return array of all products",
+        "parameters": [
+          {
+            "name": "displayName",
+            "in": "query",
+            "description": "displayName to filter by",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "minRating",
+            "in": "query",
+            "description": "minRating to filter by",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "price",
+            "in": "query",
+            "description": "price to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "displayName to filter by",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Infalid query params"
+          },
+          "404": {
+            "description": "Products not exist"
+          }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "tags": ["categories"],
+        "summary": "Get all categories",
+        "description": "Return array of all categories",
+        "parameters": [
+          {
+            "name": "includeProducts",
+            "in": "query",
+            "description": "used to display products",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeTop3Products",
+            "in": "query",
+            "description": "user to display top 3 products",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Infalid query params"
+          },
+          "404": {
+            "description": "Products not exist"
+          }
+        }
+      }
+    },
+    "/categories/{caregoryId}": {
+      "get": {
+        "tags": ["categories"],
+        "summary": "Get category",
+        "description": "Return category by id",
+        "parameters": [
+          {
+            "name": "caregoryId",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "Numeric ID of the user to get"
+          },
+          {
+            "name": "includeProducts",
+            "in": "query",
+            "description": "used to display products",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeTop3Products",
+            "in": "query",
+            "description": "user to display top 3 products",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Category"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CategoryWithProducts"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Infalid query params"
+          },
+          "404": {
+            "description": "Products not exist"
+          }
+        }
+      }
+    },
+    "/qraphQl": {
+      "get": {
+        "tags": ["graphQL"],
+        "summary": "graphQL main endpoint",
+        "description": "Provide graphQL",
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "401": {
+            "description": "Unauthorized Error"
+          },
+          "403": {
+            "description": "Forbidden Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CategoryWithProducts": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Product"
+            }
+          }
+        },
+        "xml": {
+          "name": "CategoryWithProducts"
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "xml": {
+          "name": "Category"
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "totalRating": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number"
+          }
+        },
+        "xml": {
+          "name": "Product"
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          }
+        },
+        "xml": {
+          "name": "User"
+        }
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "xml": {
+          "name": "Session"
+        }
+      }
+    }
+  }
+}
