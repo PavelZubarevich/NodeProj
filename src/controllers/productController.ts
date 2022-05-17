@@ -7,10 +7,11 @@ import { APIError } from '../error/apiError';
 import { validationResult } from 'express-validator';
 import { WebSocket } from 'ws';
 
-const ws = new WebSocket('ws://localhost:8080');
 class ProductController implements IProductController {
   async rateProduct(req: Request, res: Response, next: NextFunction) {
     try {
+      const ws = new WebSocket('ws://localhost:8080');
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         throw new APIError(400, `Infalid body params: ${errors.array()[0].param}=${errors.array()[0].value}`);

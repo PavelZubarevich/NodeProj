@@ -8,7 +8,7 @@
     "start:SQL": "cross-env NODE_ENV=development DB=pg DB_CONN_STRING=postgresql://postgres:root@localhost:5432/node_lab npm start",
     "start:Mongo": "cross-env NODE_ENV=development DB=mongo DB_CONN_STRING=mongodb://localhost:27017/db npm start",
     "build": "tsc",
-    "test": "cross-env DB=mongo jest --config ./jest.config.ts --runInBand --detectOpenHandles",
+    "test": "cross-env DB=mongo jest --config ./jest.config.js --runInBand --detectOpenHandles",
     "prepare": "husky install",
     "typeorm": "typeorm-ts-node-commonjs"
   },
