@@ -46,9 +46,9 @@ export interface IFindProps {
 }
 
 export interface IOrderListController {
-  addProductToOrder(req: Request, res: Response, next: NextFunction): any;
-  updateOrder(req: Request, res: Response, next: NextFunction): any;
-  deleteOrderList(req: Request, res: Response, next: NextFunction): any;
+  addProductToOrder(req: Request, res: Response, next: NextFunction): void;
+  updateOrder(req: Request, res: Response, next: NextFunction): void;
+  deleteOrderList(req: Request, res: Response, next: NextFunction): void;
 }
 
 export interface IOrderProduct {
