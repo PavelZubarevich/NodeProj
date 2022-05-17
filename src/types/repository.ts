@@ -1,12 +1,17 @@
 import { Response, Request, NextFunction } from 'express';
-import { SQLCategory, SQLProduct } from '../entity';
-import { UserClass, SessionsClass, ProductClass, CategoryClass } from './mongoEntity';
+import { UpdateResult } from 'typeorm';
+import { SQLCategory, SQLOrderList, SQLOrderProduct, SQLProduct, SQLSession, SQLUser } from '../entity';
+import { UserClass, SessionsClass, ProductClass, CategoryClass, OrderProduct, OrderListClass } from './mongoEntity';
 import { ISortProps, ISQLSortProps, IOrderProduct } from './types';
 
 export interface IProductRepository {
   all(req: Request, res: Response, next: NextFunction): void;
-  getProductById(id: string): any;
-  updateRatings(productId: string, userId: string, ratings: Array<object>): any;
+  getProductById(id: string): Promise<ProductClass | SQLProduct>;
+  updateRatings(
+    productId: string,
+    userId: string,
+    ratings: Array<object>
+  ): Promise<ProductClass | SQLProduct | null | string>;
   updateTotalRating(id: string): void;
   deleteRating(productId: string, userId: string): void;
   addProduct(productData: ProductClass | SQLProduct): void;
@@ -28,31 +33,43 @@ export interface ICategoryRepository {
 }
 
 export interface IUserRepository {
-  getUser(params: UserClass): any;
-  getUserById(userId: string): any;
+  getUser(params: UserClass): Promise<UserClass | SQLUser | null>;
+  getUserById(userId: string): Promise<UserClass | SQLUser | null>;
   addUser(params: UserClass): void;
   updateOne(findParams: SessionsClass, updateParams: SessionsClass): void;
 }
 
 export interface ISessionRepository {
   addSession(data: SessionsClass): void;
-  getSession(params: SessionsClass): any;
-  getCountByField(params: SessionsClass): any;
+  getSession(params: SessionsClass): Promise<SessionsClass | SQLSession | null>;
+  getCountByField(params: SessionsClass): Promise<number>;
   findOneAndDelete(params: SessionsClass, sorting: ISortProps | ISQLSortProps): void;
   updateOne(findParams: SessionsClass, updateParams: SessionsClass): void;
 }
 
 export interface IOrderListRepository {
-  getOrderByUserId(userId: string): any;
-  updateOrderProducts(order: any, products?: Array<IOrderProduct>): Promise<any>;
-  deleteOrderById(orderId: string): Promise<any>;
-  createOrder(userId: string): Promise<any>;
+  getOrderByUserId(userId: string): Promise<OrderListClass | SQLOrderList | null>;
+  updateOrderProducts(
+    order: SQLOrderList | OrderListClass,
+    products?: Array<IOrderProduct>
+  ): Promise<OrderListClass | SQLOrderList | null>;
+  deleteOrderById(orderId: string): Promise<void>;
+  createOrder(userId: string): Promise<OrderListClass | SQLOrderList | undefined>;
 }
 
 export interface IOrderProductRepository {
-  addProducts(params: IOrderProduct[]): Promise<any>;
-  updateProduct(findParams: IOrderProduct, updateParams: IOrderProduct): Promise<any>;
-  updateProducts(order: any, products: Array<IOrderProduct>): Promise<any>;
-  updateOrInsertProduct(findParams: IOrderProduct, updateParams: IOrderProduct): Promise<any>;
-  deleteAllProducts(order: any): Promise<any>;
+  addProducts(params: IOrderProduct[]): Promise<SQLOrderProduct[] | OrderProduct[]>;
+  updateProduct(
+    findParams: IOrderProduct,
+    updateParams: IOrderProduct
+  ): Promise<SQLOrderProduct | OrderProduct | null | UpdateResult>;
+  updateProducts(
+    order: SQLOrderList | OrderListClass,
+    products: Array<IOrderProduct>
+  ): Promise<Array<OrderProduct | UpdateResult | null>>;
+  updateOrInsertProduct(
+    findParams: IOrderProduct,
+    updateParams: IOrderProduct
+  ): Promise<OrderProduct | SQLOrderProduct>;
+  deleteAllProducts(order: SQLOrderList | OrderListClass): Promise<void>;
 }
