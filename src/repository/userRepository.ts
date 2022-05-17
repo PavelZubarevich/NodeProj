@@ -1,4 +1,5 @@
-import { IUserRepository, UserClass } from '../types/types';
+import { IUserRepository } from '../types/repository';
+import { UserClass } from '../types/mongoEntity';
 import { SQLUser } from '../entity';
 import { MongoUser } from '../models';
 import { AppDataSource } from '../db/postgresql';
@@ -8,6 +9,11 @@ const mongo = 'mongo';
 class UserTypegooseRepository implements IUserRepository {
   async getUser(params: UserClass) {
     const user = await MongoUser.findOne(params).exec();
+    return user;
+  }
+
+  async getUserById(userId: string) {
+    const user = await MongoUser.findById(userId);
     return user;
   }
 
@@ -23,6 +29,11 @@ class UserTypegooseRepository implements IUserRepository {
 class UserTypeOrmRepository implements IUserRepository {
   async getUser(params: UserClass) {
     const user = await AppDataSource.manager.findOne(SQLUser, { where: params });
+    return user;
+  }
+
+  async getUserById(userId: string) {
+    const user = await AppDataSource.manager.findOneBy(SQLUser, { _id: +userId });
     return user;
   }
 

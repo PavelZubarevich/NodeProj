@@ -1,7 +1,8 @@
 import { Response, Request, NextFunction } from 'express';
 import { MongoProduct } from '../models';
 import { SQLProduct, SQLUser, SQLUserRating } from '../entity';
-import { IProductRepository, IFindProps, ITotalRatingFilter, ISortProps, ISQLSortProps } from '../types/types';
+import { IFindProps, ITotalRatingFilter, ISortProps, ISQLSortProps } from '../types/types';
+import { IProductRepository } from '../types/repository';
 import { AppDataSource } from '../db/postgresql';
 import {
   Like,
