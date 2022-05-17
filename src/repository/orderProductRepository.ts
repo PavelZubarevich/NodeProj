@@ -101,7 +101,7 @@ class OrderProductTypeOrmRepository implements IOrderProductRepository {
     return newProduct;
   }
 
-  async updateProducts(order: SQLOrderList, products: Array<IOrderProduct>) {
+  async updateProducts(order: any, products: Array<IOrderProduct>) {
     const response = [];
     for (const product of products) {
       const dbProduct = await this.updateProduct(
@@ -113,7 +113,7 @@ class OrderProductTypeOrmRepository implements IOrderProductRepository {
     return response;
   }
 
-  async deleteAllProducts(order: SQLOrderList): Promise<any> {
+  async deleteAllProducts(order: any) {
     await AppDataSource.manager.delete(SQLOrderProduct, { orderListId: { _id: order._id } });
   }
 }
