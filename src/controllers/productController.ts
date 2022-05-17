@@ -78,7 +78,7 @@ class ProductController implements IProductController {
   async getProductById(req: Request, res: Response, next: NextFunction) {
     try {
       const product = await ProductRepository.getProductById(req.params.id);
-      res.status(200).send(product);
+      res.status(200).send({ product, authenticate: res.locals.token });
     } catch (e) {
       return next(e);
     }
@@ -87,7 +87,7 @@ class ProductController implements IProductController {
   async addProduct(req: Request, res: Response, next: NextFunction) {
     try {
       const product = await ProductRepository.addProduct(req.body);
-      res.status(200).send(product);
+      res.status(200).send({ product, authenticate: res.locals.token });
     } catch (e) {
       next(e);
     }
@@ -100,7 +100,7 @@ class ProductController implements IProductController {
       if (!product) {
         throw new APIError(404, 'Product does not exist');
       }
-      res.status(200).send(product);
+      res.status(200).send({ product, authenticate: res.locals.token });
     } catch (e) {
       next(e);
     }
@@ -109,7 +109,7 @@ class ProductController implements IProductController {
   async updateProduct(req: Request, res: Response, next: NextFunction) {
     try {
       const product = await ProductRepository.updateProduct(req.params.id, req.body);
-      res.status(200).send(product);
+      res.status(200).send({ product, authenticate: req.headers.authorization });
     } catch (e) {
       next(e);
     }

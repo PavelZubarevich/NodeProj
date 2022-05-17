@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "start:SQL": "cross-env NODE_ENV=development DB=pg DB_CONN_STRING=postgresql://postgres:root@localhost:5432/node_lab npm start",
-    "start:Mongo": "cross-env NODE_ENV=development DB=mongo DB_CONN_STRING=mongodb://localhost:27017/db npm start",
+    "start:Mongo": "cross-env NODE_ENV=development DB=mongo MONGO_DATABASE_URL=mongodb://localhost:27017/db ts-node-dev src/index.ts",
     "build": "tsc",
     "test": "cross-env DB=mongo jest --config ./jest.config.js --runInBand --detectOpenHandles",
     "prepare": "husky install",

@@ -7,7 +7,7 @@ class CategoryController implements ICategoryController {
   async addCategory(req: Request, res: Response, next: NextFunction) {
     try {
       const category = await CategoryRepository.addCategory(req.body);
-      res.status(200).send(category);
+      res.status(200).write({ category, authenticate: res.locals.token });
     } catch (e) {
       next(e);
     }
@@ -20,7 +20,7 @@ class CategoryController implements ICategoryController {
       if (!category) {
         throw new APIError(404, 'Category does not exist');
       }
-      res.status(200).send(category);
+      res.status(200).write({ category, authenticate: res.locals.token });
     } catch (e) {
       next(e);
     }
@@ -29,7 +29,7 @@ class CategoryController implements ICategoryController {
   async updateCategory(req: Request, res: Response, next: NextFunction) {
     try {
       const category = await CategoryRepository.updateCategory(req.params.id, req.body);
-      res.status(200).send(category);
+      res.status(200).write({ category, authenticate: res.locals.token });
     } catch (e) {
       next(e);
     }

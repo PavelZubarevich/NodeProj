@@ -46,7 +46,7 @@ class OrderListController implements IOrderListController {
         }
       }
 
-      res.status(200).send(response);
+      res.status(200).send({ response, authenticate: res.locals.token });
     } catch (e) {
       return next(e);
     }
@@ -69,7 +69,7 @@ class OrderListController implements IOrderListController {
       } else {
         throw new APIError(404, 'Order does not exists');
       }
-      res.status(200).send(response);
+      res.status(200).send({ response, authenticate: res.locals.token });
     } catch (e) {
       next(e);
     }
@@ -88,7 +88,7 @@ class OrderListController implements IOrderListController {
         throw new APIError(404, 'Order List does not exist');
       }
 
-      res.status(200).send(order);
+      res.status(200).send({ order, authenticate: res.locals.token });
     } catch (e) {
       next(e);
     }
