@@ -18,6 +18,16 @@ export interface ExtendedProductClass extends ProductClass {
 export interface IProductController {
   rateProduct(req: Request, res: Response, next: NextFunction): void;
   deleteRating(req: Request, res: Response, next: NextFunction): void;
+  getProductById(req: Request, res: Response, next: NextFunction): void;
+  addProduct(req: Request, res: Response, next: NextFunction): void;
+  deleteProduct(req: Request, res: Response, next: NextFunction): void;
+  updateProduct(req: Request, res: Response, next: NextFunction): void;
+}
+
+export interface ICategoryController {
+  addCategory(req: Request, res: Response, next: NextFunction): void;
+  deleteCategory(req: Request, res: Response, next: NextFunction): void;
+  updateCategory(req: Request, res: Response, next: NextFunction): void;
 }
 
 export interface ITotalRatingFilter {

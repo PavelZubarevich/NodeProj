@@ -1,5 +1,6 @@
 import { Response, Request, NextFunction } from 'express';
-import { UserClass, SessionsClass } from './mongoEntity';
+import { SQLCategory, SQLProduct } from '../entity';
+import { UserClass, SessionsClass, ProductClass, CategoryClass } from './mongoEntity';
 import { ISortProps, ISQLSortProps, IOrderProduct } from './types';
 
 export interface IProductRepository {
@@ -8,11 +9,17 @@ export interface IProductRepository {
   updateRatings(productId: string, userId: string, ratings: Array<object>): any;
   updateTotalRating(id: string): void;
   deleteRating(productId: string, userId: string): void;
+  addProduct(productData: ProductClass | SQLProduct): void;
+  deleteProductById(productId: string): void;
+  updateProduct(productId: string, data: ProductClass | SQLProduct): void;
 }
 
 export interface ICategoryRepository {
   all(req: Request, res: Response, next: NextFunction): void;
   getCategory(req: Request, res: Response, next: NextFunction): void;
+  addCategory(categoryData: CategoryClass | SQLCategory): void;
+  deleteCategoryById(categoryId: string): void;
+  updateCategory(categoryId: string, data: CategoryClass | SQLCategory): void;
 }
 
 export interface IUserRepository {

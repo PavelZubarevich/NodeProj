@@ -61,6 +61,46 @@ class ProductController implements IProductController {
       return next(e);
     }
   }
+
+  async getProductById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const product = await ProductRepository.getProductById(req.params.id);
+      res.status(200).send(product);
+    } catch (e) {
+      return next(e);
+    }
+  }
+
+  async addProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+      const product = await ProductRepository.addProduct(req.body);
+      res.status(200).send(product);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async deleteProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+      const product = await ProductRepository.deleteProductById(req.params.id);
+
+      if (!product) {
+        throw new APIError(404, 'Product does not exist');
+      }
+      res.status(200).send(product);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async updateProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+      const product = await ProductRepository.updateProduct(req.params.id, req.body);
+      res.status(200).send(product);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export default new ProductController();

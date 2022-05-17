@@ -7,6 +7,7 @@ import { Types } from 'mongoose';
 import { FindManyOptions } from 'typeorm';
 import { APIError } from '../error/apiError';
 import { validationResult } from 'express-validator';
+import { CategoryClass } from '../types/mongoEntity';
 
 const mongo = 'mongo';
 
@@ -69,6 +70,26 @@ class CategoryTypegooseRepository implements ICategoryRepository {
     } catch (e) {
       return next(e);
     }
+  }
+
+  async addCategory(categoryData: CategoryClass) {
+    const category = await MongoCategory.create({
+      displayName: categoryData.displayName,
+      createdAt: Date.now()
+    });
+    return category;
+  }
+
+  async deleteCategoryById(categoryId: string) {
+    const category = await MongoCategory.findOneAndDelete({ _id: categoryId });
+    return category;
+  }
+
+  async updateCategory(categoryId: string, data: CategoryClass) {
+    const product = await MongoCategory.findOneAndUpdate({ _id: categoryId }, data, {
+      returnDocument: 'after'
+    });
+    return product;
   }
 }
 
@@ -133,6 +154,29 @@ class CategoryTypeOrmRepository implements ICategoryRepository {
     } catch (e) {
       return next(e);
     }
+  }
+
+  async addCategory(categoryData: SQLCategory) {
+    const category = await AppDataSource.manager.save(SQLCategory, {
+      displayName: categoryData.displayName
+    });
+
+    return category;
+  }
+
+  async deleteCategoryById(categoryId: string) {
+    await AppDataSource.manager.remove(SQLCategory, { id: +categoryId });
+    return `Category ${categoryId} deleted`;
+  }
+
+  async updateCategory(categoryId: string, data: SQLCategory) {
+    const category = await AppDataSource.manager.findOneBy(SQLCategory, { id: +categoryId });
+
+    const newCategory = await AppDataSource.manager.save(SQLCategory, {
+      id: category?.id,
+      displayName: data.displayName
+    });
+    return newCategory;
   }
 }
 

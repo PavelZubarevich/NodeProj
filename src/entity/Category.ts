@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, CreateDateColumn } from 'typeorm';
 import { SQLProduct } from './Product';
 
 @Entity()
@@ -9,7 +9,7 @@ export class SQLCategory {
   @Column()
   displayName?: string;
 
-  @Column()
+  @CreateDateColumn()
   createdAt?: Date;
 
   @ManyToMany(() => SQLProduct, (product) => product.categoryId)

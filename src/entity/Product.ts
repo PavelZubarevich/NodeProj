@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Index,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+  CreateDateColumn
+} from 'typeorm';
 import { SQLUserRating, SQLCategory } from './';
 
 @Entity()
@@ -6,10 +15,10 @@ export class SQLProduct {
   @PrimaryGeneratedColumn()
   _id?: number;
 
-  @Column()
+  @Column({ unique: true })
   displayName?: string;
 
-  @Column()
+  @CreateDateColumn()
   createdAt?: Date;
 
   @Index()
