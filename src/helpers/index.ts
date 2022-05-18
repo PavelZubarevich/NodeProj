@@ -29,6 +29,7 @@ export const verifyUserMiddleware = (req: Request, res: Response, next: NextFunc
   const token = req.headers.authorization?.split(' ')[1] || '';
   const user = jwt.verify(token, JWT_ACCESS_SECTER_KEY);
   res.locals.user = user;
+  res.locals.token = token;
   next();
 };
 
@@ -38,6 +39,7 @@ export const verifyAdminMiddleware = (req: Request, res: Response, next: NextFun
 
   if ((<any>user).userRole === 'admin') {
     res.locals.user = user;
+    res.locals.token = token;
   } else {
     throw new APIError(403, 'Admins only');
   }

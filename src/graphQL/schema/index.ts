@@ -9,7 +9,7 @@ import {
 } from 'graphql';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { JWT_ACCESS_SECTER_KEY, JWT_REFRESH_SECTER_KEY } from '../../config';
+import { JWT_ACCESS_SECTER_KEY } from '../../config';
 import {
   UserRepository,
   ProductRepository,
@@ -19,15 +19,7 @@ import {
 } from '../../repository';
 import { APIError } from '../../error/apiError';
 import 'reflect-metadata';
-
-const generateTokens = (userId: string, userRole: string | undefined) => {
-  const accessToken = jwt.sign({ userId, userRole }, JWT_ACCESS_SECTER_KEY, { expiresIn: '15m' });
-  const refreshToken = jwt.sign({ userId, userRole }, JWT_REFRESH_SECTER_KEY, { expiresIn: '50d' });
-  return {
-    accessToken,
-    refreshToken
-  };
-};
+import { generateTokens } from '../../helpers';
 
 const UserType = new GraphQLObjectType({
   name: 'User',

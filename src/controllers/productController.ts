@@ -7,10 +7,11 @@ import { APIError } from '../error/apiError';
 import { validationResult } from 'express-validator';
 import { WebSocket } from 'ws';
 
-const ws = new WebSocket('ws://localhost:8080');
 class ProductController implements IProductController {
   async rateProduct(req: Request, res: Response, next: NextFunction) {
     try {
+      const ws = new WebSocket('ws://localhost:8080');
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         throw new APIError(400, `Infalid body params: ${errors.array()[0].param}=${errors.array()[0].value}`);
@@ -77,7 +78,7 @@ class ProductController implements IProductController {
   async getProductById(req: Request, res: Response, next: NextFunction) {
     try {
       const product = await ProductRepository.getProductById(req.params.id);
-      res.status(200).send(product);
+      res.status(200).send({ product, authenticate: res.locals.token });
     } catch (e) {
       return next(e);
     }
@@ -86,7 +87,7 @@ class ProductController implements IProductController {
   async addProduct(req: Request, res: Response, next: NextFunction) {
     try {
       const product = await ProductRepository.addProduct(req.body);
-      res.status(200).send(product);
+      res.status(200).send({ product, authenticate: res.locals.token });
     } catch (e) {
       next(e);
     }
@@ -99,7 +100,7 @@ class ProductController implements IProductController {
       if (!product) {
         throw new APIError(404, 'Product does not exist');
       }
-      res.status(200).send(product);
+      res.status(200).send({ product, authenticate: res.locals.token });
     } catch (e) {
       next(e);
     }
@@ -108,7 +109,7 @@ class ProductController implements IProductController {
   async updateProduct(req: Request, res: Response, next: NextFunction) {
     try {
       const product = await ProductRepository.updateProduct(req.params.id, req.body);
-      res.status(200).send(product);
+      res.status(200).send({ product, authenticate: req.headers.authorization });
     } catch (e) {
       next(e);
     }

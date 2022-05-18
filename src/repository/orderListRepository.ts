@@ -1,7 +1,6 @@
 import { MongoOrderList } from '../models';
 import { IOrderListRepository } from '../types/repository';
 import { AppDataSource } from '../db/postgresql';
-// import OrderProductRepository from './orderProductRepository';
 import { IOrderProduct } from '../types/types';
 import { SQLOrderList } from '../entity';
 import UserRepository from './userRepository';
@@ -53,7 +52,7 @@ class OrderListTypeOrmRepository implements IOrderListRepository {
     return product;
   }
 
-  async updateOrderProducts(order: any, products: Array<any>) {
+  async updateOrderProducts(order: SQLOrderList, products: Array<any>) {
     const newOrder = await AppDataSource.manager.findOne(SQLOrderList, {
       relations: { products: true },
       where: { _id: order._id }
