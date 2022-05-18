@@ -5,7 +5,9 @@ import jwt from 'jsonwebtoken';
 import { JWT_ACCESS_SECTER_KEY } from '../config';
 import { APIError } from '../error/apiError';
 import { validationResult } from 'express-validator';
+import { WebSocket } from 'ws';
 
+const ws = new WebSocket('ws://localhost:8080');
 class ProductController implements IProductController {
   async rateProduct(req: Request, res: Response, next: NextFunction) {
     try {
@@ -29,19 +31,29 @@ class ProductController implements IProductController {
           ratings.map((rating) => {
             if (rating.userId === (<any>user).userId) {
               isRated = true;
-              return (rating.rating = +req.body.rating);
+              rating.rating = +req.body.rating;
+              rating.createdAt = new Date();
+              return rating;
             }
             return rating;
           });
           if (!isRated) {
-            ratings.push({ userId: (<any>user).userId, rating: +req.body.rating });
+            ratings.push({
+              userId: (<any>user).userId,
+              rating: +req.body.rating,
+              createdAt: new Date()
+            });
           }
         } else {
           throw new APIError(404, 'Product does not exist');
         }
 
         const newProduct = await ProductRepository.updateRatings(req.params.id, (<any>user).userId, ratings);
+
+        ws.send('');
         res.status(200).send(newProduct);
+      } else {
+        throw new APIError(401, 'Buyers only');
       }
     } catch (e) {
       return next(e);
