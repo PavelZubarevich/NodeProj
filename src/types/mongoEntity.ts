@@ -78,3 +78,17 @@ export class OrderProduct {
   @prop({ required: true })
   quantity!: number;
 }
+
+export class LastRating {
+  @prop({ ref: () => UserClass, required: true })
+  userId?: Ref<UserClass>;
+
+  @prop({ ref: () => ProductClass, required: true })
+  productId?: Ref<ProductClass>;
+
+  @prop({ required: true })
+  rating?: number;
+
+  @prop({ default: Date.now() })
+  createdAt?: Date;
+}

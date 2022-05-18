@@ -14,6 +14,14 @@ import { verifyUserMiddleware, verifyAdminMiddleware, updateTokens } from './hel
 import { WebSocketServer } from 'ws';
 import { ProductRatingsController } from './controllers';
 import { ProductRatingsRepository } from './repository';
+import cron from 'node-cron';
+
+const task = cron.schedule('0 0 0 * * 1', () => {
+  console.log('running a task every minute');
+  ProductRatingsController.deleteRatings();
+});
+
+task.start();
 
 const wss = new WebSocketServer({ port: 8080 }, () => console.log('WS starter on port 8080'));
 

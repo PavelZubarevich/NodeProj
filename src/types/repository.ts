@@ -16,6 +16,7 @@ export interface IProductRepository {
 
 export interface IProductRatingsRepository {
   getLatestRatings(): void;
+  deleteRatings(): void;
 }
 
 export interface ICategoryRepository {

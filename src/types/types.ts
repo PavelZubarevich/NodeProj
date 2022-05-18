@@ -26,6 +26,7 @@ export interface IProductController {
 
 export interface IProductRatingsController {
   getLatestRatings(req: Request, res: Response, next: NextFunction): void;
+  deleteRatings(): void;
 }
 
 export interface ICategoryController {

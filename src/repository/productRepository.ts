@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from 'express';
-import { MongoProduct } from '../models';
-import { SQLCategory, SQLProduct, SQLUser, SQLUserRating } from '../entity';
+import { MongoLastRatings, MongoProduct } from '../models';
+import { SQLCategory, SQLLastRating, SQLProduct, SQLUser, SQLUserRating } from '../entity';
 import { IFindProps, ITotalRatingFilter, ISortProps, ISQLSortProps } from '../types/types';
 import { IProductRepository } from '../types/repository';
 import { AppDataSource } from '../db/postgresql';
@@ -72,7 +72,7 @@ class ProductTypegooseRepository implements IProductRepository {
     return product;
   }
 
-  async updateRatings(id: string, userId: string, updateParams: Array<object>) {
+  async updateRatings(id: string, userId: string, updateParams: Array<object | any>) {
     try {
       const product = await MongoProduct.findOneAndUpdate(
         { _id: id },
@@ -81,6 +81,13 @@ class ProductTypegooseRepository implements IProductRepository {
         },
         { returnDocument: 'after' }
       );
+
+      updateParams.forEach((param) => {
+        param.productId = product?._id;
+      });
+
+      await MongoLastRatings.insertMany(updateParams);
+
       await this.updateTotalRating(id);
       return product;
     } catch (e) {
@@ -211,7 +218,7 @@ class ProductTypeOrmRepository implements IProductRepository {
   }
 
   async updateRatings(id: string, userId: string, updateParams: Array<SQLUserRating>) {
-    const ratedProduct = await AppDataSource.manager.findOne(SQLProduct, {
+    const ratedProduct = await AppDataSource.manager.findOneOrFail(SQLProduct, {
       relations: { ratings: true },
       where: {
         _id: +id,
@@ -227,6 +234,8 @@ class ProductTypeOrmRepository implements IProductRepository {
     const userRatingId = userRatings[0]?._id;
 
     if (userRatingId) {
+      const product = await AppDataSource.manager.findOneOrFail(SQLProduct, { where: { _id: +id } });
+
       await AppDataSource.manager.update(
         SQLUserRating,
         {
@@ -236,6 +245,11 @@ class ProductTypeOrmRepository implements IProductRepository {
           rating: updateParams[0].rating
         }
       );
+      await AppDataSource.getRepository(SQLLastRating).save({
+        userId: ratedProduct,
+        productId: product,
+        rating: updateParams[0].rating
+      });
       await this.updateTotalRating(id);
       return 'updated';
     } else {
@@ -243,6 +257,11 @@ class ProductTypeOrmRepository implements IProductRepository {
       const product = await AppDataSource.manager.findOneOrFail(SQLProduct, { where: { _id: +id } });
 
       const rating = await AppDataSource.getRepository(SQLUserRating).save({
+        userId: user,
+        productId: product,
+        rating: updateParams[0].rating
+      });
+      await AppDataSource.getRepository(SQLLastRating).save({
         userId: user,
         productId: product,
         rating: updateParams[0].rating
