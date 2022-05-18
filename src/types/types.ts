@@ -24,6 +24,11 @@ export interface IProductController {
   updateProduct(req: Request, res: Response, next: NextFunction): void;
 }
 
+export interface IProductRatingsController {
+  getLatestRatings(req: Request, res: Response, next: NextFunction): void;
+  deleteRatings(): void;
+}
+
 export interface ICategoryController {
   addCategory(req: Request, res: Response, next: NextFunction): void;
   deleteCategory(req: Request, res: Response, next: NextFunction): void;
@@ -50,4 +55,10 @@ export interface IOrderProduct {
   productId?: string;
   orderListId?: string;
   quantity?: number;
+}
+
+export interface IUserRating {
+  userId: any;
+  rating: number;
+  createdAt: Date;
 }

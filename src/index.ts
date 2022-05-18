@@ -10,10 +10,33 @@ import { errors } from './graphQL/error';
 import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
-import { verifyUserMiddleware, verifyAdminMiddleware } from './helpers';
+import { verifyUserMiddleware, verifyAdminMiddleware, updateTokens } from './helpers';
+import { WebSocketServer } from 'ws';
+import { ProductRatingsController } from './controllers';
+import { ProductRatingsRepository } from './repository';
+import cron from 'node-cron';
+
+const task = cron.schedule('0 0 0 * * 1', () => {
+  console.log('running a task every minute');
+  ProductRatingsController.deleteRatings();
+});
+
+task.start();
+
+const wss = new WebSocketServer({ port: 8080 }, () => console.log('WS starter on port 8080'));
+
+wss.on('connection', function connection(ws) {
+  ws.on('message', async function message(data: any) {
+    const ratings = await ProductRatingsRepository.getLatestRatings();
+
+    wss.clients.forEach((client) => {
+      client.send(JSON.stringify(ratings));
+    });
+  });
+});
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const mongo = 'mongo';
 const developmentMode = process.env.NODE_ENV;
 
@@ -43,8 +66,9 @@ app.use(APILogger);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/products', productRouter);
 app.use('/categories', categoryRouter);
-app.use('/order-list', verifyUserMiddleware, orderListRouter);
-app.use('/admin', verifyAdminMiddleware, adminRouter);
+app.use('/order-list', updateTokens, verifyUserMiddleware, orderListRouter);
+app.use('/admin', updateTokens, verifyAdminMiddleware, adminRouter);
+app.get('/lastRatings', ProductRatingsController.getLatestRatings);
 app.use(
   '/graphql',
   graphqlHTTP((req, res) => ({

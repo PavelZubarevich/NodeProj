@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, UpdateDateColumn } from 'typeorm';
 import { SQLProduct } from './';
 import { SQLUser } from './User';
 
@@ -15,4 +15,7 @@ export class SQLUserRating {
 
   @Column()
   rating?: number;
+
+  @UpdateDateColumn()
+  createdAt?: Date;
 }

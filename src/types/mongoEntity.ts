@@ -1,4 +1,4 @@
-import { prop, index, Ref } from '@typegoose/typegoose';
+import { prop, index, Ref, modelOptions, Severity } from '@typegoose/typegoose';
 
 export class SessionsClass {
   @prop({ require: true })
@@ -33,6 +33,7 @@ export class CategoryClass {
   public createdAt?: Date;
 }
 
+@modelOptions({ options: { allowMixed: Severity.ALLOW } })
 @index({ totalRating: 1 })
 @index({ price: 1 })
 export class ProductClass {
@@ -55,6 +56,7 @@ export class ProductClass {
   public ratings?: {
     userId: string;
     rating: number;
+    createdAt: Date;
   }[];
 }
 
@@ -76,4 +78,18 @@ export class OrderProduct {
 
   @prop({ required: true })
   quantity!: number;
+}
+
+export class LastRating {
+  @prop({ ref: () => UserClass, required: true })
+  userId?: Ref<UserClass>;
+
+  @prop({ ref: () => ProductClass, required: true })
+  productId?: Ref<ProductClass>;
+
+  @prop({ required: true })
+  rating?: number;
+
+  @prop({ default: Date.now() })
+  createdAt?: Date;
 }
