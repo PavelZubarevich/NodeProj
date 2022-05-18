@@ -1,4 +1,4 @@
-import { prop, index, Ref } from '@typegoose/typegoose';
+import { prop, index, Ref, modelOptions, Severity } from '@typegoose/typegoose';
 
 export class SessionsClass {
   @prop({ require: true })
@@ -33,6 +33,7 @@ export class CategoryClass {
   public createdAt?: Date;
 }
 
+@modelOptions({ options: { allowMixed: Severity.ALLOW } })
 @index({ totalRating: 1 })
 @index({ price: 1 })
 export class ProductClass {
