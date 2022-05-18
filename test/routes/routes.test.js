@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const { adminRouter, productRouter, categoryRouter } = require('../../src/routes');
 const { updateTokens, verifyAdminMiddleware } = require('../../src/helpers');
 const { generateTokens } = require('../../src/helpers');
-const { MongoCategory, MongoProduct } = require('../../src/models');
+const { MongoCategory, MongoProduct, MongoUser } = require('../../src/models');
 const { dbConnect, dbDisconnect, mongoInit } = require('../handlers');
 
 const app = express();
@@ -431,6 +431,106 @@ describe('testing category routes', () => {
 
     it('GET /categories/:id - should return category does not exist err', async () => {
       const response = await request(app).get('/categories/6242efa661a153abae8eb7bb');
+      expect(response.statusCode).toBe(404);
+    });
+  });
+});
+
+describe('testing products routes', () => {
+  let uri;
+  let mongo;
+  let productId;
+
+  beforeAll(async () => {
+    [mongo, uri] = await mongoInit();
+    await dbConnect(uri);
+  });
+
+  afterAll(async () => {
+    await dbDisconnect(mongo);
+  });
+
+  describe('Test get products method', () => {
+    it('GET /products - success', async () => {
+      await MongoProduct.create({
+        displayName: 'getTest',
+        price: 1
+      });
+
+      const response = await request(app).get('/products');
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual([
+        {
+          _id: expect.any(String),
+          displayName: 'getTest',
+          price: 1,
+          categoryId: [],
+          createdAt: expect.any(String),
+          ratings: [],
+          __v: 0
+        }
+      ]);
+    });
+  });
+
+  describe('Test rate product method', () => {
+    beforeEach(() => {
+      productId = new mongoose.Types.ObjectId();
+    });
+
+    it('POST /products/:id/rate - success', async () => {
+      const body = {
+        rating: 3
+      };
+
+      await MongoProduct.create({
+        _id: productId,
+        displayName: 'getTest',
+        price: 1
+      });
+
+      const user = await MongoUser.create({
+        userName: 'user',
+        password: 'password'
+      });
+
+      const { accessToken } = generateTokens(user._id, 'buyer');
+
+      const response = await request(app)
+        .post(`/products/${productId}/rate`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(body);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual({
+        __v: 0,
+        _id: expect.any(String),
+        categoryId: [],
+        createdAt: expect.any(String),
+        displayName: 'getTest',
+        price: 1,
+        ratings: [{ createdAt: expect.any(String), rating: 3, userId: expect.any(String) }]
+      });
+    });
+
+    it('POST /products/:id/rate - token required', async () => {
+      const response = await request(app).get('/admin/products/1');
+      expect(response.statusCode).toBe(401);
+    });
+
+    it('POST /products/:id/rate - buyer only', async () => {
+      const { accessToken } = generateTokens('1', 'any');
+      const response = await request(app).get('/admin/products/1').set('Authorization', `Bearer ${accessToken}`);
+      expect(response.statusCode).toBe(403);
+    });
+
+    it('POST /products/:id/rate - should return product does not exist err', async () => {
+      const { accessToken } = generateTokens('1', 'admin');
+
+      const response = await request(app)
+        .get('/products/6242efa661a153abae8eb7bb/rate')
+        .set('Authorization', `Bearer ${accessToken}`);
       expect(response.statusCode).toBe(404);
     });
   });
