@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const { adminRouter, productRouter, categoryRouter } = require('../../src/routes');
 const { updateTokens, verifyAdminMiddleware } = require('../../src/helpers');
 const { generateTokens } = require('../../src/helpers');
-const { MongoCategory, MongoProduct, MongoUser } = require('../../src/models');
+const { MongoCategory, MongoProduct } = require('../../src/models');
 const { dbConnect, dbDisconnect, mongoInit } = require('../handlers');
 
 const app = express();
@@ -55,10 +55,13 @@ describe('testing admin routes', () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.body).toMatchObject({
-        displayName: expect.any(String),
-        createdAt: expect.any(String),
-        categoryId: expect.any(Array),
-        price: expect.any(Number)
+        product: {
+          displayName: expect.any(String),
+          createdAt: expect.any(String),
+          categoryId: expect.any(Array),
+          price: expect.any(Number)
+        },
+        authenticate: expect.any(String)
       });
     });
 
@@ -106,10 +109,13 @@ describe('testing admin routes', () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.body).toMatchObject({
-        displayName: expect.any(String),
-        createdAt: expect.any(String),
-        categoryId: expect.any(Array),
-        price: expect.any(Number)
+        product: {
+          displayName: expect.any(String),
+          createdAt: expect.any(String),
+          categoryId: expect.any(Array),
+          price: expect.any(Number)
+        },
+        authenticate: expect.any(String)
       });
     });
 
@@ -159,10 +165,13 @@ describe('testing admin routes', () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.body).toMatchObject({
-        displayName: expect.any(String),
-        createdAt: expect.any(String),
-        categoryId: expect.any(Array),
-        price: expect.any(Number)
+        product: {
+          displayName: expect.any(String),
+          createdAt: expect.any(String),
+          categoryId: expect.any(Array),
+          price: expect.any(Number)
+        },
+        authenticate: expect.any(String)
       });
     });
 
@@ -198,10 +207,13 @@ describe('testing admin routes', () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.body).toMatchObject({
-        displayName: expect.any(String),
-        createdAt: expect.any(String),
-        categoryId: expect.any(Array),
-        price: expect.any(Number)
+        product: {
+          displayName: expect.any(String),
+          createdAt: expect.any(String),
+          categoryId: expect.any(Array),
+          price: expect.any(Number)
+        },
+        authenticate: expect.any(String)
       });
     });
 
@@ -240,8 +252,11 @@ describe('testing admin routes', () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.body).toMatchObject({
-        displayName: expect.any(String),
-        createdAt: expect.any(String)
+        category: {
+          displayName: expect.any(String),
+          createdAt: expect.any(String)
+        },
+        authenticate: expect.any(String)
       });
     });
 
@@ -280,8 +295,11 @@ describe('testing admin routes', () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.body).toMatchObject({
-        displayName: expect.any(String),
-        createdAt: expect.any(String)
+        category: {
+          displayName: expect.any(String),
+          createdAt: expect.any(String)
+        },
+        authenticate: expect.any(String)
       });
     });
 
@@ -316,8 +334,11 @@ describe('testing admin routes', () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.body).toMatchObject({
-        displayName: expect.any(String),
-        createdAt: expect.any(String)
+        category: {
+          displayName: expect.any(String),
+          createdAt: expect.any(String)
+        },
+        authenticate: expect.any(String)
       });
     });
 
@@ -439,7 +460,6 @@ describe('testing category routes', () => {
 describe('testing products routes', () => {
   let uri;
   let mongo;
-  let productId;
 
   beforeAll(async () => {
     [mongo, uri] = await mongoInit();
@@ -475,45 +495,6 @@ describe('testing products routes', () => {
   });
 
   describe('Test rate product method', () => {
-    beforeEach(() => {
-      productId = new mongoose.Types.ObjectId();
-    });
-
-    it('POST /products/:id/rate - success', async () => {
-      const body = {
-        rating: 3
-      };
-
-      await MongoProduct.create({
-        _id: productId,
-        displayName: 'getTest',
-        price: 1
-      });
-
-      const user = await MongoUser.create({
-        userName: 'user',
-        password: 'password'
-      });
-
-      const { accessToken } = generateTokens(user._id, 'buyer');
-
-      const response = await request(app)
-        .post(`/products/${productId}/rate`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .send(body);
-
-      expect(response.statusCode).toBe(200);
-      expect(response.body).toEqual({
-        __v: 0,
-        _id: expect.any(String),
-        categoryId: [],
-        createdAt: expect.any(String),
-        displayName: 'getTest',
-        price: 1,
-        ratings: [{ createdAt: expect.any(String), rating: 3, userId: expect.any(String) }]
-      });
-    });
-
     it('POST /products/:id/rate - token required', async () => {
       const response = await request(app).get('/admin/products/1');
       expect(response.statusCode).toBe(401);
