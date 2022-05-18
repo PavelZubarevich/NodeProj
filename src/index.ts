@@ -36,7 +36,7 @@ wss.on('connection', function connection(ws) {
 });
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const mongo = 'mongo';
 const developmentMode = process.env.NODE_ENV;
 

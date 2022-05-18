@@ -193,7 +193,7 @@ const Mutation = new GraphQLObjectType({
               throw new APIError(404, 'PRODUCT_NOT_FOUND');
             }
 
-            const newProduct = await ProductRepository.updateRatings(productId, (<any>user).userId, ratings);
+            const newProduct = await ProductRepository.updateRatings(productId, (<any>user).userId, <any>ratings);
 
             ProductRepository.updateTotalRating(productId);
             return JSON.stringify(newProduct);

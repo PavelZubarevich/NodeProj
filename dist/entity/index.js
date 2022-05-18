@@ -1,0 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SQLLastRating = exports.SQLOrderProduct = exports.SQLOrderList = exports.SQLUserRating = exports.SQLUser = exports.SQLSession = exports.SQLProduct = exports.SQLCategory = void 0;
+const Product_1 = require("./Product");
+Object.defineProperty(exports, "SQLProduct", { enumerable: true, get: function () { return Product_1.SQLProduct; } });
+const Category_1 = require("./Category");
+Object.defineProperty(exports, "SQLCategory", { enumerable: true, get: function () { return Category_1.SQLCategory; } });
+const Session_1 = require("./Session");
+Object.defineProperty(exports, "SQLSession", { enumerable: true, get: function () { return Session_1.SQLSession; } });
+const User_1 = require("./User");
+Object.defineProperty(exports, "SQLUser", { enumerable: true, get: function () { return User_1.SQLUser; } });
+const UserRatings_1 = require("./UserRatings");
+Object.defineProperty(exports, "SQLUserRating", { enumerable: true, get: function () { return UserRatings_1.SQLUserRating; } });
+const OrderList_1 = require("./OrderList");
+Object.defineProperty(exports, "SQLOrderList", { enumerable: true, get: function () { return OrderList_1.SQLOrderList; } });
+const OrderProduct_1 = require("./OrderProduct");
+Object.defineProperty(exports, "SQLOrderProduct", { enumerable: true, get: function () { return OrderProduct_1.SQLOrderProduct; } });
+const LastRatings_1 = require("./LastRatings");
+Object.defineProperty(exports, "SQLLastRating", { enumerable: true, get: function () { return LastRatings_1.SQLLastRating; } });
+//# sourceMappingURL=index.js.map
