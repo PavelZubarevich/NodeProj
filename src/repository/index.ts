@@ -3,6 +3,7 @@ import CategoryRepository from './catalogRepository';
 import UserRepository from './userRepository';
 import OrderListRepository from './orderListRepository';
 import OrderProductRepository from './orderProductRepository';
+import SessionRepository from './sessionRepository';
 import ProductRatingsRepository from './productRatingsRepository';
 
 export {
@@ -11,5 +12,6 @@ export {
   UserRepository,
   OrderListRepository,
   OrderProductRepository,
+  SessionRepository,
   ProductRatingsRepository
 };
