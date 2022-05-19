@@ -20,7 +20,6 @@ const task = cron.schedule('0 0 0 * * 1', () => {
   console.log('running a task every minute');
   ProductRatingsController.deleteRatings();
 });
-
 task.start();
 
 const wss = new WebSocketServer({ port: 8080 }, () => console.log('WS starter on port 8080'));
