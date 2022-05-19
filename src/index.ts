@@ -74,6 +74,7 @@ app.use(
   graphqlHTTP((req, res) => ({
     schema: schema,
     context: { req, res },
+    graphiql: true,
     customFormatErrorFn: (e) => {
       const error = errors[e.message];
 
