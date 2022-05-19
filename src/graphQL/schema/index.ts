@@ -59,9 +59,10 @@ const Mutation = new GraphQLObjectType({
         userName: { type: GraphQLString },
         password: { type: GraphQLString },
         firstName: { type: GraphQLString, defaultValue: null },
-        lastName: { type: GraphQLString, defaultValue: null }
+        lastName: { type: GraphQLString, defaultValue: null },
+        role: { type: GraphQLString, defaultValue: 'buyer' }
       },
-      async resolve(parent, { userName, password, firstName, lastName }, { req, res }) {
+      async resolve(parent, { userName, password, firstName, lastName, role }, { req, res }) {
         const user = await UserRepository.getUser({ userName });
         if (user) {
           res.status(403);
@@ -70,7 +71,7 @@ const Mutation = new GraphQLObjectType({
 
         const hashedPass = await bcrypt.hash(password, 10);
 
-        await UserRepository.addUser({ userName, password: hashedPass, firstName, lastName });
+        await UserRepository.addUser({ userName, password: hashedPass, firstName, lastName, role });
         return `User ${userName} added`;
       }
     },
