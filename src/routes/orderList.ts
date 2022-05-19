@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 import { OrderListController } from '../controllers';
+import { validateQueryDataMiddleware } from '../helpers';
 
 const orderListRouter = Router();
 
@@ -18,6 +19,7 @@ orderListRouter.post(
     }
     return false;
   }),
+  validateQueryDataMiddleware,
   OrderListController.addProductToOrder
 );
 
@@ -35,6 +37,7 @@ orderListRouter.put(
     }
     return false;
   }),
+  validateQueryDataMiddleware,
   OrderListController.updateOrder
 );
 

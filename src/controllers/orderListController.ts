@@ -1,16 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { IOrderListController } from '../types/types';
 import { APIError } from '../error/apiError';
-import { validationResult } from 'express-validator';
 import { OrderListRepository, OrderProductRepository } from '../repository';
 
 class OrderListController implements IOrderListController {
   async addProductToOrder(req: Request, res: Response, next: NextFunction) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        throw new APIError(400, `Infalid body params: ${errors.array()[0].param}=${errors.array()[0].value}`);
-      }
       const user = res.locals.user;
       const products = req.body.products;
       let response;
@@ -54,10 +49,6 @@ class OrderListController implements IOrderListController {
 
   async updateOrder(req: Request, res: Response, next: NextFunction) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        throw new APIError(400, `Infalid body params: ${errors.array()[0].param}=${errors.array()[0].value}`);
-      }
       const user = res.locals.user;
       const products = req.body.products;
       let response;

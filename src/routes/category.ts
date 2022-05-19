@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { CategoryRepository } from '../repository';
 import { query } from 'express-validator';
+import { validateQueryDataMiddleware } from '../helpers';
 
 const categoryRouter = Router();
 
@@ -24,6 +25,7 @@ categoryRouter.get(
       return true;
     })
     .optional(),
+  validateQueryDataMiddleware,
   CategoryRepository.getCategory
 );
 

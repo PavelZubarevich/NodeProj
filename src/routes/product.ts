@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { ProductRepository } from '../repository';
 import { body, query } from 'express-validator';
 import { ProductController } from '../controllers';
+import { validateQueryDataMiddleware } from '../helpers';
 
 const productRouter = Router();
 
@@ -38,6 +39,7 @@ productRouter.get(
       return true;
     })
     .optional(),
+  validateQueryDataMiddleware,
   ProductRepository.all
 );
 
@@ -45,6 +47,7 @@ productRouter.post(
   '/:id/rate',
   body('rating').isFloat({ min: 0, max: 10 }),
   body('comment').isString().optional(),
+  validateQueryDataMiddleware,
   ProductController.rateProduct
 );
 
